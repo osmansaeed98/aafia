@@ -2,13 +2,19 @@
 
 Doctor and hospital booking web app for families in Khartoum. See
 `CLAUDE.md` for the full brief. Built with [Next.js](https://nextjs.org),
-hosted on [Vercel](https://vercel.com) (no extra settings needed).
+hosted on [Vercel](https://vercel.com), data in [Supabase](https://supabase.com).
 
-- `app/` – pages: home (`page.js`), offline emergency page (`emergency/`),
-  language switch (`lang/`), home-screen settings (`manifest.js`)
-- `components/` – shared page parts (header, language switch)
+- `app/` – pages: home, offline emergency page (`emergency/`), language
+  switch (`lang/`), admin area (`admin/`)
+- `components/` – shared page parts; `components/admin/` – admin forms
 - `lib/i18n/` – all wording, Sudanese Arabic (`ar.js`) and English (`en.js`)
-- `lib/format.js` – numbers, times and dates (always Western digits)
-- `lib/emergency-departments.js` – the checked list of emergency departments
+- `lib/format.js` – numbers, times, money (always Western digits)
+- `lib/supabase/` – database connection; `lib/admin/` – admin checks and form reading
+- `proxy.js` – keeps the team's sign-in fresh on admin pages
 - `public/sw.js` – keeps the emergency page working offline
-- `tests/` – `npm test` builds the app and checks it in a phone-sized browser
+- `supabase/migrations/` – the database design and access rules, in order
+- `scripts/db-migrate.js` – applies new migrations (`npm run db:migrate`)
+- `tests/` – `npm test`: helpers, database access rules, and the app in a
+  phone-sized browser (uses temporary test accounts, removed afterwards)
+
+Settings the app needs are listed in `.env.example`.
