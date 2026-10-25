@@ -3,3 +3,7 @@ node_modules/
 out/
 .vercel/
 .env*.local
+.env
+.env.*
+!.env.example
+test-results/
