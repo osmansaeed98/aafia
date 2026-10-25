@@ -17,6 +17,9 @@ on their own computer.
 - Clinic dashboard: web pages for reception staff. Tonight's queue,
   call next number, add walk-ins, mark cash payments, post delays.
 - Chatbot "مساعد عافية" (Aafia assistant), powered by the Claude API.
+- Admin area: web pages for the Aafia team to add and update clinics,
+  doctors, hours, fees and locations. This is the only source of the
+  clinic facts the chatbot uses.
 
 ## Scope rules
 
@@ -43,8 +46,12 @@ on their own computer.
 ## Users and constraints
 
 - Low-end Android phones, weak and expensive data: small pages, text
-  first, images only on Wi-Fi, SMS fallback for bookings and alerts.
-- Login: phone number + one-time SMS code. No passwords.
+  first, images only on Wi-Fi.
+- Messages: WhatsApp first for login codes, booking confirmations and
+  alerts; SMS only as backup when WhatsApp can't reach the person
+  (SMS to Sudan costs far more per message).
+- Login: phone number + one-time code (WhatsApp, SMS as backup).
+  No passwords.
 - Arabic-first, right-to-left by default; English as a setting.
 - UI copy in Sudanese Arabic dialect; specialty names in standard
   Arabic with the English beneath.
