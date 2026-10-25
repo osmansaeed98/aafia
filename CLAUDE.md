@@ -42,6 +42,9 @@ on their own computer.
   short, text only.
 - The API key lives on the server only, never in the browser.
 - Chats are private and used only to answer the patient.
+- Model: Claude Sonnet 5.5 (`claude-sonnet-5-5`). Before launch, run
+  the Arabic/English test conversations on Sonnet 5.5 and Haiku 5.5
+  and move to the cheaper one only if it passes every safety test.
 
 ## Users and constraints
 
