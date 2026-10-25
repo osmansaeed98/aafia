@@ -17,6 +17,10 @@ on their own computer.
 - Clinic dashboard: web pages for reception staff. Tonight's queue,
   call next number, add walk-ins, mark cash payments, post delays.
 - Chatbot "مساعد عافية" (Aafia assistant), powered by the Claude API.
+  NOT in the first version: build it only after launch, when the
+  owner asks.
+  NOT in the first version: build it only after launch, when the owner
+  asks for it.
 - Admin area: web pages for the Aafia team to add and update clinics,
   doctors, hours, fees and locations. This is the only source of the
   clinic facts the chatbot uses.
@@ -72,7 +76,17 @@ on their own computer.
 - Corners: 8 / 14 / 20 px, pills for chips and time slots.
 - Tap targets at least 48 px tall.
 
+## Spending
+
+- No extra spending. Stay on free plans; never turn on a paid plan,
+  paid add-on or anything billed per use without the owner's explicit
+  OK first, with the expected monthly cost in plain numbers.
+
 ## How we work
+
+- No extra spending: stay on free plans. Never upgrade a plan, turn on
+  a paid add-on or start anything billed per use without the owner's
+  explicit OK first, and say what it will cost.
 
 - Build one milestone at a time; plan first, then build.
 - Never put API keys or passwords in code or chat; use .env files

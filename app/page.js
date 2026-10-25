@@ -20,14 +20,6 @@ export default async function Home() {
           <span className="badge">{t.comingSoon}</span>
         </div>
 
-        <div className="action" aria-disabled="true">
-          <span>
-            <span className="action-title">{t.assistant}</span>
-            <span className="action-hint">{t.assistantHint}</span>
-          </span>
-          <span className="badge">{t.comingSoon}</span>
-        </div>
-
         <Link href="/emergency" className="action action-danger">
           <span>
             <span className="action-title">{t.emergency}</span>
