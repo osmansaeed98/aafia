@@ -48,7 +48,8 @@ on their own computer.
 - Arabic-first, right-to-left by default; English as a setting.
 - UI copy in Sudanese Arabic dialect; specialty names in standard
   Arabic with the English beneath.
-- Digits: [Arabic-Indic or Western — decide and fill in].
+- Digits: Western (0123456789) everywhere, including inside Arabic
+  text: prices, times, dates, phone numbers and queue numbers.
 
 ## Brand
 
