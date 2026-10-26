@@ -177,3 +177,12 @@ test("a broken or expired sign-in link explains what to do", async () => {
   assert.match(await page.innerText("form button"), /رسل رابط الدخول/);
   await page.context().close();
 });
+
+test("the login page names the reason when a link can't be sent", async () => {
+  const page = await pageAs(null);
+  await page.goto(app.base + "/admin/login?email=a%40b.com&error=rate");
+  assert.match(await page.innerText(".alert-error"), /استنى ساعة/);
+  await page.goto(app.base + "/admin/login?email=a%40b.com&error=notAuthorized");
+  assert.match(await page.innerText(".alert-error"), /أعضاء حساب Supabase/);
+  await page.context().close();
+});
