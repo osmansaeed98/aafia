@@ -43,6 +43,8 @@ export async function sendLink(form) {
     // Shows up in Vercel's logs, to see exactly why Supabase refused.
     console.error("Sign-in link not sent:", error.code, error.status, error.message);
     params.set("error", SEND_ERRORS[error.code] ?? "send");
+    // Technical reason, shown small under the message to help fix it.
+    params.set("reason", String(error.code ?? error.name ?? error.status ?? "unknown").slice(0, 60));
   }
   redirect(`/admin/login?${params}`);
 }

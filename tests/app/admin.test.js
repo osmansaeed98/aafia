@@ -184,5 +184,7 @@ test("the login page names the reason when a link can't be sent", async () => {
   assert.match(await page.innerText(".alert-error"), /استنى ساعة/);
   await page.goto(app.base + "/admin/login?email=a%40b.com&error=notAuthorized");
   assert.match(await page.innerText(".alert-error"), /أعضاء حساب Supabase/);
+  await page.goto(app.base + "/admin/login?email=a%40b.com&error=send&reason=invalid_api_key");
+  assert.match(await page.innerText(".alert-error .error-reason"), /invalid_api_key/);
   await page.context().close();
 });
