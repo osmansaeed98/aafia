@@ -166,3 +166,14 @@ test("the team page lists members and explains unknown emails", async () => {
   await page.waitForURL(/error=invalid/);
   await page.context().close();
 });
+
+test("a broken or expired sign-in link explains what to do", async () => {
+  const page = await pageAs(null);
+  await page.goto(app.base + "/admin/auth/callback?code=not-a-real-code");
+  assert.equal(new URL(page.url()).pathname, "/admin/login");
+  assert.match(await page.innerText(".alert-error"), /رابط جديد/);
+  await page.goto(app.base + "/admin/auth/callback");
+  assert.match(await page.innerText(".alert-error"), /رابط جديد/);
+  assert.match(await page.innerText("form button"), /رسل رابط الدخول/);
+  await page.context().close();
+});

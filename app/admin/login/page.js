@@ -1,5 +1,5 @@
 import { getDictionary, getLang } from "@/lib/i18n";
-import { sendCode, verifyCode } from "./actions";
+import { sendLink } from "./actions";
 
 export const metadata = { robots: { index: false } };
 
@@ -13,40 +13,28 @@ export default async function AdminLogin({ searchParams }) {
 
       {error && (
         <p className="alert alert-error" role="alert">
-          {error === "code" ? t.errorCode : t.errorSend}
+          {error === "link" ? t.errorLink : t.errorSend}
         </p>
       )}
 
-      {email ? (
-        <form action={verifyCode} className="form">
-          <p>
-            {t.codeSent} <strong dir="ltr">{email}</strong>
+      {email && !error ? (
+        <div className="form">
+          <p className="alert alert-ok" role="status">
+            {t.linkSent} <strong dir="ltr">{email}</strong>
           </p>
-          <input type="hidden" name="email" value={email} />
-          <label className="field">
-            <span>{t.code}</span>
-            <input
-              name="code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9٠-٩ ]{6,12}"
-              required
-              dir="ltr"
-              autoFocus
-            />
-          </label>
-          <button className="button button-solid">{t.verify}</button>
+          <p>{t.openLink}</p>
+          <p className="muted">{t.sameBrowser}</p>
           <a href="/admin/login" className="back-link">
             {t.otherEmail}
           </a>
-        </form>
+        </div>
       ) : (
-        <form action={sendCode} className="form">
+        <form action={sendLink} className="form">
           <label className="field">
             <span>{t.email}</span>
-            <input name="email" type="email" autoComplete="email" required dir="ltr" />
+            <input name="email" type="email" autoComplete="email" required dir="ltr" defaultValue={email} />
           </label>
-          <button className="button button-solid">{t.sendCode}</button>
+          <button className="button button-solid">{t.sendLink}</button>
         </form>
       )}
     </div>

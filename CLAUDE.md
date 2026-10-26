@@ -57,6 +57,9 @@ on their own computer.
   (SMS to Sudan costs far more per message).
 - Login: phone number + one-time code (WhatsApp, SMS as backup).
   No passwords.
+- Aafia team (admin area): emailed sign-in link for now, because
+  Supabase's built-in email can't be customised. Before launch: add
+  custom SMTP and switch to a bilingual email with a typed code.
 - Arabic-first, right-to-left by default; English as a setting.
 - UI copy in Sudanese Arabic dialect; specialty names in standard
   Arabic with the English beneath.
