@@ -13,7 +13,7 @@ export default async function AdminLogin({ searchParams }) {
 
       {error && (
         <p className="alert alert-error" role="alert">
-          {error === "link" ? t.errorLink : t.errorSend}
+          {{ link: t.errorLink, rate: t.errorRate, notAuthorized: t.errorNotAuthorized }[error] ?? t.errorSend}
         </p>
       )}
 

@@ -9,6 +9,13 @@ function cleanEmail(form) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : null;
 }
 
+// Supabase's reasons for not sending, shown to the person in plain words.
+const SEND_ERRORS = {
+  over_email_send_rate_limit: "rate",
+  over_request_rate_limit: "rate",
+  email_address_not_authorized: "notAuthorized",
+};
+
 // The address this site is running on, e.g. https://aafia.vercel.app
 async function siteOrigin() {
   const h = await headers();
@@ -32,7 +39,11 @@ export async function sendLink(form) {
     },
   });
   const params = new URLSearchParams({ email });
-  if (error) params.set("error", "send");
+  if (error) {
+    // Shows up in Vercel's logs, to see exactly why Supabase refused.
+    console.error("Sign-in link not sent:", error.code, error.status, error.message);
+    params.set("error", SEND_ERRORS[error.code] ?? "send");
+  }
   redirect(`/admin/login?${params}`);
 }
 
