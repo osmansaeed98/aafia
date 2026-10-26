@@ -1,8 +1,20 @@
-# aafia
+# Aafia (عافية)
 
-A minimal [Next.js](https://nextjs.org) web app, ready to deploy on [Vercel](https://vercel.com).
+Doctor and hospital booking web app for families in Khartoum. See
+`CLAUDE.md` for the full brief. Built with [Next.js](https://nextjs.org),
+hosted on [Vercel](https://vercel.com), data in [Supabase](https://supabase.com).
 
-- `app/page.js` — the home page
-- `app/layout.js` — the shared page wrapper (title, `<html>`/`<body>`)
+- `app/` – pages: home, offline emergency page (`emergency/`), language
+  switch (`lang/`), admin area (`admin/`)
+- `components/` – shared page parts; `components/admin/` – admin forms
+- `lib/i18n/` – all wording, Sudanese Arabic (`ar.js`) and English (`en.js`)
+- `lib/format.js` – numbers, times, money (always Western digits)
+- `lib/supabase/` – database connection; `lib/admin/` – admin checks and form reading
+- `proxy.js` – keeps the team's sign-in fresh on admin pages
+- `public/sw.js` – keeps the emergency page working offline
+- `supabase/migrations/` – the database design and access rules, in order
+- `scripts/db-migrate.js` – applies new migrations (`npm run db:migrate`)
+- `tests/` – `npm test`: helpers, database access rules, and the app in a
+  phone-sized browser (uses temporary test accounts, removed afterwards)
 
-Vercel detects Next.js automatically: import this repository in Vercel and it builds with no extra settings.
+Settings the app needs are listed in `.env.example`.
