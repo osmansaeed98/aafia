@@ -5,7 +5,7 @@ export const metadata = { robots: { index: false } };
 
 export default async function AdminLogin({ searchParams }) {
   const t = getDictionary(await getLang()).admin.login;
-  const { email, error } = await searchParams;
+  const { email, error, reason } = await searchParams;
 
   return (
     <div className="admin narrow">
@@ -14,6 +14,11 @@ export default async function AdminLogin({ searchParams }) {
       {error && (
         <p className="alert alert-error" role="alert">
           {{ link: t.errorLink, rate: t.errorRate, notAuthorized: t.errorNotAuthorized }[error] ?? t.errorSend}
+          {reason && (
+            <small className="error-reason" dir="ltr">
+              {reason}
+            </small>
+          )}
         </p>
       )}
 

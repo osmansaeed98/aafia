@@ -545,3 +545,10 @@ details[open] > .form {
 .tile span {
   font-size: 14px;
 }
+
+.error-reason {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  opacity: 0.8;
+}
