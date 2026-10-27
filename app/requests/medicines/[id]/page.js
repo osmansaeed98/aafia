@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import RatingForm from "@/components/RatingForm";
 import { formatDateTime } from "@/lib/datetime";
 import { formatMoney } from "@/lib/format";
 import { getDictionary, getLang } from "@/lib/i18n";
@@ -11,15 +12,19 @@ export default async function MedicineRequest({ params, searchParams }) {
   const lang = await getLang();
   const t = getDictionary(lang).pharmacy;
   const { id } = await params;
-  const { ok, error } = await searchParams;
+  const { ok, error, rating } = await searchParams;
   if (!/^\d+$/.test(id)) notFound();
   const { supabase } = await requirePatient(`/requests/medicines/${id}`);
   const { data: r } = await supabase
     .from("pharmacy_requests")
-    .select("id, status, patient_name, items_text, photo_path, total_sdg, ready_at, pharmacy_note, created_at, places(name_ar, name_en, area_ar, area_en, phone)")
+    .select("id, status, patient_name, items_text, photo_path, record_id, total_sdg, ready_at, pharmacy_note, created_at, place_id, places(name_ar, name_en, area_ar, area_en, phone)")
     .eq("id", id)
     .maybeSingle();
   if (!r) notFound();
+  const done = r.status === "collected";
+  const { data: myRating } = done
+    ? await supabase.from("ratings").select("stars, comment").eq("pharmacy_request_id", r.id).maybeSingle()
+    : { data: null };
   const { data: signed } = r.photo_path
     ? await supabase.storage.from("prescriptions").createSignedUrl(r.photo_path, 600)
     : { data: null };
@@ -72,6 +77,11 @@ export default async function MedicineRequest({ params, searchParams }) {
           {t.photo}
         </a>
       )}
+      {r.record_id && (
+        <a href={`/records/${r.record_id}/file`} className="button" target="_blank" rel="noopener">
+          {getDictionary(lang).records.fromRecord}
+        </a>
+      )}
       <p className="muted">{t.cash}</p>
       {open && (
         <details className="confirm-delete">
@@ -82,6 +92,9 @@ export default async function MedicineRequest({ params, searchParams }) {
             <button className="button button-danger">{t.cancel}</button>
           </form>
         </details>
+      )}
+      {done && (
+        <RatingForm kind="medicines" id={r.id} existing={myRating} note={rating} title={getDictionary(lang).ratings.titleMedicines} t={getDictionary(lang).ratings} />
       )}
       <a href="/account" className="back-link">
         {getDictionary(lang).booking.myBookings}

@@ -35,14 +35,14 @@ export async function startApp(port) {
   return { base, stop: () => process.kill(-server.pid) };
 }
 
-// Deletes a test account's uploaded prescription photos through
-// Supabase's file API (the database refuses direct deletes).
-export async function removeOwnPhotos(user) {
+// Deletes files a test account uploaded (prescription photos by default)
+// through Supabase's file API (the database refuses direct deletes).
+export async function removeOwnPhotos(user, bucket = "prescriptions", folder = user.id) {
   const client = createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
   const { error } = await client.auth.signInWithPassword({ email: user.email, password: user.password });
   if (error) return;
-  const { data } = await client.storage.from("prescriptions").list(user.id);
-  if (data?.length) await client.storage.from("prescriptions").remove(data.map((f) => `${user.id}/${f.name}`));
+  const { data } = await client.storage.from(bucket).list(folder);
+  if (data?.length) await client.storage.from(bucket).remove(data.map((f) => `${folder}/${f.name}`));
 }
 
 // The public's view of the database (what anyone on the internet sees).

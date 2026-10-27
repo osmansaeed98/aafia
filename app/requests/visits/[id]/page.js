@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import RatingForm from "@/components/RatingForm";
 import { formatDay } from "@/lib/booking";
 import { formatDateTime } from "@/lib/datetime";
 import { formatMoney, telHref } from "@/lib/format";
@@ -12,7 +13,7 @@ export default async function VisitRequest({ params, searchParams }) {
   const lang = await getLang();
   const t = getDictionary(lang).visits;
   const { id } = await params;
-  const { ok, error } = await searchParams;
+  const { ok, error, rating } = await searchParams;
   if (!/^\d+$/.test(id)) notFound();
   const { supabase } = await requirePatient(`/requests/visits/${id}`);
   const { data: r } = await supabase
@@ -21,6 +22,10 @@ export default async function VisitRequest({ params, searchParams }) {
     .eq("id", id)
     .maybeSingle();
   if (!r) notFound();
+  const done = r.status === "done";
+  const { data: myRating } = done
+    ? await supabase.from("ratings").select("stars, comment").eq("visit_request_id", r.id).maybeSingle()
+    : { data: null };
   const open = ["requested", "confirmed"].includes(r.status);
 
   return (
@@ -87,6 +92,9 @@ export default async function VisitRequest({ params, searchParams }) {
             <button className="button button-danger">{t.cancel}</button>
           </form>
         </details>
+      )}
+      {done && (
+        <RatingForm kind="visit" id={r.id} existing={myRating} note={rating} title={getDictionary(lang).ratings.title} t={getDictionary(lang).ratings} />
       )}
       <a href="/account" className="back-link">
         {getDictionary(lang).booking.myBookings}

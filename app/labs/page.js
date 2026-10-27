@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Stars from "@/components/Stars";
 import { getDictionary, getLang } from "@/lib/i18n";
+import { ratingSummary } from "@/lib/ratings";
 import { createSupabasePublic } from "@/lib/supabase/server";
 
 export const metadata = { title: "المعامل | Aafia" };
@@ -7,13 +9,15 @@ export const metadata = { title: "المعامل | Aafia" };
 export default async function Labs() {
   const lang = await getLang();
   const t = getDictionary(lang).labs;
-  const { data } = await createSupabasePublic()
+  const db = createSupabasePublic();
+  const [{ data }, ratings] = await Promise.all([db
     .from("places")
     .select("id, name_ar, name_en, area_ar, area_en, doctors!inner(id, is_lab_desk)")
     .eq("kind", "lab")
     .eq("doctors.is_lab_desk", true)
-    .order("name_ar");
+    .order("name_ar"), ratingSummary(db)]);
   const labs = data ?? [];
+  const tr = getDictionary(lang).ratings;
 
   return (
     <div className="admin">
@@ -28,7 +32,8 @@ export default async function Labs() {
               <Link href={`/book/${lab.doctors[0].id}`} className="row row-link">
                 <span>
                   <strong>{lang === "en" ? lab.name_en : lab.name_ar}</strong>
-                  <small className="muted"> · {lang === "en" ? lab.area_en : lab.area_ar}</small>
+                  <small className="muted"> · {lang === "en" ? lab.area_en : lab.area_ar}</small>{" "}
+                  <Stars summary={ratings.places.get(lab.id)} t={tr} />
                 </span>
                 <span className="chip">{t.book}</span>
               </Link>

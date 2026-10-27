@@ -24,6 +24,7 @@ export default async function Home() {
             ["/labs", t.labs, t.labsHint],
             ["/pharmacies", t.pharmacy, t.pharmacyHint],
             ["/home-visits", t.visits, t.visitsHint],
+            ["/records", t.records, t.recordsHint],
           ].map(([href, title, hint]) => (
             <Link key={href} href={href} className="action action-small">
               <span>

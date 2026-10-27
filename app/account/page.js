@@ -140,6 +140,10 @@ export default async function Account({ searchParams }) {
         </a>
       )}
 
+      <a href="/records" className="button records-link">
+        {dict.records.title}
+      </a>
+
       <section className="card">
         <div className="title-row">
           <h2>{tb.myBookings}</h2>

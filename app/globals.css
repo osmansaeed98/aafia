@@ -939,3 +939,57 @@ textarea {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Ratings: saffron stars are a fill, the number stays in ink. */
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.stars > span[aria-hidden],
+.stars-big {
+  color: var(--saffron);
+}
+.stars-big {
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  margin: 0;
+}
+.stars-off {
+  color: var(--line);
+}
+.star-choice .slot strong span {
+  color: var(--saffron);
+}
+
+/* Medical file */
+.records-link {
+  margin: 8px 0;
+}
+.record {
+  display: grid;
+  gap: 8px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.record:last-child {
+  border-bottom: 0;
+}
+.record-files {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.record-files a {
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+  color: var(--nile);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}

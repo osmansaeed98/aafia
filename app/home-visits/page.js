@@ -1,5 +1,7 @@
 import Link from "next/link";
+import Stars from "@/components/Stars";
 import { getDictionary, getLang } from "@/lib/i18n";
+import { ratingSummary } from "@/lib/ratings";
 import { createSupabasePublic } from "@/lib/supabase/server";
 
 export const metadata = { title: "زيارة منزلية | Aafia" };
@@ -8,12 +10,14 @@ export default async function HomeVisits() {
   const lang = await getLang();
   const t = getDictionary(lang).visits;
   const kinds = getDictionary(lang).admin.kinds;
-  const { data } = await createSupabasePublic()
+  const db = createSupabasePublic();
+  const [{ data }, ratings] = await Promise.all([db
     .from("places")
     .select("id, kind, name_ar, name_en, area_ar, area_en")
     .eq("home_visits", true)
-    .order("name_ar");
+    .order("name_ar"), ratingSummary(db)]);
   const places = data ?? [];
+  const tr = getDictionary(lang).ratings;
 
   return (
     <div className="admin">
@@ -32,7 +36,8 @@ export default async function HomeVisits() {
                   <small className="muted">
                     {" "}
                     · {kinds[p.kind]} · {lang === "en" ? p.area_en : p.area_ar}
-                  </small>
+                  </small>{" "}
+                  <Stars summary={ratings.places.get(p.id)} t={tr} />
                 </span>
                 <span className="chip">{t.open}</span>
               </Link>

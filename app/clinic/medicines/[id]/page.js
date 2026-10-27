@@ -19,7 +19,7 @@ export default async function MedicineRequestDesk({ params, searchParams }) {
   const { supabase, team } = await getStaff(`/clinic/medicines/${id}`);
   const { data: r } = await supabase
     .from("pharmacy_requests")
-    .select("id, place_id, status, patient_name, patient_phone, items_text, photo_path, total_sdg, ready_at, pharmacy_note, created_at")
+    .select("id, place_id, status, patient_name, patient_phone, items_text, photo_path, record_id, total_sdg, ready_at, pharmacy_note, created_at, medical_records(title)")
     .eq("id", id)
     .maybeSingle();
   if (!r || !canManage(team, r.place_id)) notFound();
@@ -53,6 +53,12 @@ export default async function MedicineRequestDesk({ params, searchParams }) {
         <a href={signed.signedUrl} className="photo-link">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={signed.signedUrl} alt={tp.photo} />
+        </a>
+      )}
+      {r.record_id && (
+        <a href={`/records/${r.record_id}/file`} className="button" target="_blank" rel="noopener">
+          {dict.records.fromRecord}
+          {r.medical_records?.title && ` · ${r.medical_records.title}`}
         </a>
       )}
       {(r.total_sdg !== null || r.pharmacy_note) && (

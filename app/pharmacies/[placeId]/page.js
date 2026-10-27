@@ -20,7 +20,10 @@ export default async function Pharmacy({ params, searchParams }) {
     .eq("kind", "pharmacy")
     .maybeSingle();
   if (!place) notFound();
-  const { user, profile, family } = await patientContext();
+  const { supabase, user, profile, family } = await patientContext();
+  const { count: prescriptions } = user
+    ? await supabase.from("medical_records").select("id", { count: "exact", head: true }).eq("owner_id", user.id).eq("kind", "prescription")
+    : { count: 0 };
   const login = getDictionary(lang).book;
 
   return (
@@ -51,6 +54,11 @@ export default async function Pharmacy({ params, searchParams }) {
         </a>
       ) : (
         <form action={requestMedicines} className="form">
+          {prescriptions > 0 && (
+            <a href="/records" className="notice">
+              {getDictionary(lang).records.haveRecord}
+            </a>
+          )}
           <input type="hidden" name="place_id" value={place.id} />
           <PersonChoice title={t.forWhom} meLabel={t.me} profile={profile} family={family} />
           <PrescriptionPhoto label={t.photo} hint={t.photoHint} readyLabel={t.photoReady} tooBigLabel={t.errors.photo} />

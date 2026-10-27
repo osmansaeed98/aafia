@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { fill, formatDay } from "@/lib/booking";
 import { formatClock, formatMoney, telHref } from "@/lib/format";
+import Stars from "@/components/Stars";
 import { getDictionary, getLang } from "@/lib/i18n";
+import { ratingSummary } from "@/lib/ratings";
 import { createSupabasePublic, createSupabaseServer } from "@/lib/supabase/server";
 import { bookNumber } from "../actions";
 
@@ -13,13 +15,14 @@ export default async function BookDoctor({ params, searchParams }) {
   if (!/^\d+$/.test(doctorId)) notFound();
 
   const publicDb = createSupabasePublic();
-  const [{ data: doctor }, { data: sessionsData }] = await Promise.all([
+  const [{ data: doctor }, { data: sessionsData }, ratings] = await Promise.all([
     publicDb
       .from("doctors")
       .select("id, place_id, is_lab_desk, name_ar, name_en, fee_sdg, specialties(name_ar, name_en), places(name_ar, name_en, area_ar, area_en, address_ar, address_en, phone, latitude, longitude)")
       .eq("id", doctorId)
       .maybeSingle(),
     publicDb.rpc("available_sessions", { p_doctor_id: Number(doctorId), p_days: 7 }),
+    ratingSummary(publicDb),
   ]);
   if (!doctor) notFound();
   const sessions = sessionsData ?? [];
@@ -65,6 +68,10 @@ export default async function BookDoctor({ params, searchParams }) {
         )}
       </p>
       )}
+      <Stars
+        summary={doctor.is_lab_desk ? ratings.places.get(doctor.place_id) : ratings.doctors.get(doctor.id)}
+        t={getDictionary(lang).ratings}
+      />
 
       <section className="card">
         <p>

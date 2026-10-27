@@ -141,5 +141,14 @@ on their own computer.
   patients and reception can't sign in on the live site yet).
 - Never add made-up hospitals or phone numbers to the database; only
   details the owner has confirmed.
-- Next: Milestone 6, medical records (incl. lab results), prescriptions
-  and ratings.
+- Milestone 6 done: "My medical file" `/records` (lab results,
+  prescriptions, reports per person; reception adds files to an app
+  booking on the session page; patients add/delete their own; files in
+  the private "medical-files" bucket, opened via `/records/<id>/file`
+  short-lived links). Only the patient and that place's reception see a
+  record; Aafia admins do NOT. A prescription can be sent from the file to
+  a pharmacy (that pharmacy sees just that one; sent ones can't be
+  deleted). Ratings: 1-5 stars + private comment after a completed visit,
+  medicine pickup or home visit, once, within 60 days; public stars only
+  after 3 ratings; admins read comments on `/admin/ratings`.
+- Next: owner's choice (e.g. finish the WhatsApp setup and launch prep).
