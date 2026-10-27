@@ -8,10 +8,12 @@ export default async function Specialties({ searchParams }) {
   const t = getDictionary(await getLang()).admin;
   const { supabase } = await getAdminSession();
   const { ok, error } = await searchParams;
-  const { data: specialties = [] } = await supabase
+  const x = t.examples;
+  const { data: specialtiesData } = await supabase
     .from("specialties")
     .select("id, name_ar, name_en")
     .order("name_ar");
+  const specialties = specialtiesData ?? [];
 
   return (
     <>
@@ -22,8 +24,8 @@ export default async function Specialties({ searchParams }) {
       <details className="add-more card">
         <summary className="button button-solid">{t.specialties.add}</summary>
         <form action={saveSpecialty} className="form">
-          <Field label={t.fields.nameAr} name="name_ar" required dir="rtl" />
-          <Field label={t.fields.nameEn} name="name_en" required dir="ltr" />
+          <Field label={t.fields.nameAr} placeholder={x.specialtyAr} name="name_ar" required dir="rtl" />
+          <Field label={t.fields.nameEn} placeholder={x.specialtyEn} name="name_en" required dir="ltr" />
           <button className="button button-solid">{t.save}</button>
         </form>
       </details>

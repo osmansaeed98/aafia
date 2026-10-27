@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin/auth";
+import { normalizeSudanPhone } from "@/lib/phone";
 import {
   InvalidInput,
   checkbox,
@@ -86,6 +87,8 @@ export async function saveDoctor(form) {
       name_ar: text(form, "name_ar"),
       name_en: text(form, "name_en"),
       fee_sdg: number(form, "fee_sdg", { integer: true, min: 0 }),
+      daily_limit: number(form, "daily_limit", { required: true, integer: true, min: 1, max: 200 }),
+      minutes_per_patient: number(form, "minutes_per_patient", { required: true, integer: true, min: 3, max: 120 }),
       is_active: checkbox(form, "is_active"),
     };
     const id = number(form, "id", { integer: true });
@@ -198,8 +201,12 @@ export async function addTeamMember(form) {
     if (role !== "admin" && role !== "reception") throw new InvalidInput("role");
     const placeId = number(form, "place_id", { integer: true });
     if (role === "reception" && !placeId) throw new InvalidInput("place_id");
+    // An email, or a Sudanese phone number stored as "249912345678".
+    const contact = text(form, "email");
+    const phoneNumber = contact.includes("@") ? null : normalizeSudanPhone(contact);
+    if (!contact.includes("@") && !phoneNumber) throw new InvalidInput("email");
     const { data, error } = await supabase.rpc("add_team_member", {
-      member_email: text(form, "email"),
+      member_email: phoneNumber ? phoneNumber.slice(1) : contact,
       member_role: role,
       member_place_id: placeId,
     });

@@ -5,6 +5,7 @@ const KINDS = ["clinic", "hospital", "lab", "pharmacy"];
 
 export default function PlaceForm({ t, place }) {
   const f = t.fields;
+  const x = t.examples;
   const p = place ?? {};
   return (
     <form action={savePlace} className="form">
@@ -19,16 +20,16 @@ export default function PlaceForm({ t, place }) {
           ))}
         </select>
       </label>
-      <Field label={f.nameAr} name="name_ar" defaultValue={p.name_ar} required dir="rtl" />
-      <Field label={f.nameEn} name="name_en" defaultValue={p.name_en} required dir="ltr" />
-      <Field label={f.areaAr} name="area_ar" defaultValue={p.area_ar} required dir="rtl" />
-      <Field label={f.areaEn} name="area_en" defaultValue={p.area_en} required dir="ltr" />
-      <Field label={f.addressAr} optional={f.optional} name="address_ar" defaultValue={p.address_ar ?? ""} dir="rtl" />
-      <Field label={f.addressEn} optional={f.optional} name="address_en" defaultValue={p.address_en ?? ""} dir="ltr" />
-      <Field label={f.phone} optional={f.optional} name="phone" type="tel" defaultValue={p.phone ?? ""} dir="ltr" />
+      <Field label={f.nameAr} placeholder={x.clinicNameAr} name="name_ar" defaultValue={p.name_ar} required dir="rtl" />
+      <Field label={f.nameEn} placeholder={x.clinicNameEn} name="name_en" defaultValue={p.name_en} required dir="ltr" />
+      <Field label={f.areaAr} placeholder={x.areaAr} name="area_ar" defaultValue={p.area_ar} required dir="rtl" />
+      <Field label={f.areaEn} placeholder={x.areaEn} name="area_en" defaultValue={p.area_en} required dir="ltr" />
+      <Field label={f.addressAr} optional={f.optional} placeholder={x.addressAr} name="address_ar" defaultValue={p.address_ar ?? ""} dir="rtl" />
+      <Field label={f.addressEn} optional={f.optional} placeholder={x.addressEn} name="address_en" defaultValue={p.address_en ?? ""} dir="ltr" />
+      <Field label={f.phone} optional={f.optional} placeholder={x.phone} name="phone" type="tel" defaultValue={p.phone ?? ""} dir="ltr" />
       <div className="pair">
-        <Field label={f.latitude} optional={f.optional} name="latitude" inputMode="decimal" defaultValue={p.latitude ?? ""} dir="ltr" />
-        <Field label={f.longitude} optional={f.optional} name="longitude" inputMode="decimal" defaultValue={p.longitude ?? ""} dir="ltr" />
+        <Field label={f.latitude} optional={f.optional} placeholder={x.latitude} name="latitude" inputMode="decimal" defaultValue={p.latitude ?? ""} dir="ltr" />
+        <Field label={f.longitude} optional={f.optional} placeholder={x.longitude} name="longitude" inputMode="decimal" defaultValue={p.longitude ?? ""} dir="ltr" />
       </div>
       <small className="hint">{f.mapsHint}</small>
       <Check label={f.homeVisits} name="home_visits" defaultChecked={p.home_visits} />

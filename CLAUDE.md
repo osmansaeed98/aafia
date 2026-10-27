@@ -90,3 +90,45 @@ on their own computer.
   that are not committed.
 - After each milestone: run it, write short tests, commit with a
   clear message.
+
+## Where we are (update at the end of each milestone)
+
+- Live site: https://aafia-a14h.vercel.app (Vercel, deploys from `main`).
+  Work happens on branch `setup-web-app`; the owner merges it into
+  `main` on GitHub (Compare & pull request → Merge).
+- Supabase project ref: `wexdrgrmkhjlwjklkris` (Frankfurt, free plan).
+  Database changes live in `supabase/migrations/`; apply with
+  `npm run db:migrate`. In Claude's cloud session the Supabase token is
+  added automatically for api.supabase.com (database read/write only;
+  auth settings must be changed by the owner in the dashboard). Node's
+  fetch needs `NODE_USE_ENV_PROXY=1` here (the npm scripts set it).
+- `npm test` runs helper tests, database access-rule tests and the app
+  in a phone-sized browser against the real database (temporary test
+  accounts and "E2E" entries, removed afterwards).
+- Done: Milestone 1 (look, home page, offline emergency page),
+  Milestone 2 (database, access rules, admin area with email-link
+  login; owner `osmanmohammed98@gmail.com` is the first admin) and
+  Milestone 3 code (patient login by WhatsApp code via Supabase's Send
+  SMS hook → `/api/auth/send-code` → Meta WhatsApp Cloud API directly,
+  Sudanese +249 mobiles only; patient profile and family members,
+  private to each patient). Owner chose Meta direct (~$0.005/code)
+  over Twilio; SMS backup stays OFF until approved with a monthly cap.
+- Milestone 4 done: booking by queue number per doctor session (from
+  the doctor's weekly hours, or the place's), max 3 upcoming bookings
+  per account, daily limit and minutes-per-patient per doctor; live
+  queue page (Supabase Realtime + 30 s refresh); clinic dashboard
+  `/clinic` for reception (call next, arrived/seen/no-show, walk-ins,
+  cash paid, delays, cancel/close). All booking changes go through
+  database functions (`book`, `call_next`, …); nobody writes the
+  tables directly. Reception staff sign in by phone (WhatsApp code)
+  and are added on the admin Team page by phone number. Doctors only
+  (clinics/hospitals); labs, pharmacies and home visits are later.
+- WhatsApp booking messages are built but OFF
+  (`BOOKING_MESSAGES_ENABLED`), pending the owner's OK (~$0.01/booking).
+- Waiting on the owner: Meta, Vercel and Supabase setup in
+  `docs/whatsapp-login-setup.md` (phone login is off until then, so
+  patients and reception can't sign in on the live site yet).
+- Never add made-up hospitals or phone numbers to the database; only
+  details the owner has confirmed.
+- Next: Milestone 5, labs, pharmacies and home visits; then medical
+  records, prescriptions and ratings.
