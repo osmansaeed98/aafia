@@ -113,9 +113,22 @@ on their own computer.
   Sudanese +249 mobiles only; patient profile and family members,
   private to each patient). Owner chose Meta direct (~$0.005/code)
   over Twilio; SMS backup stays OFF until approved with a monthly cap.
+- Milestone 4 done: booking by queue number per doctor session (from
+  the doctor's weekly hours, or the place's), max 3 upcoming bookings
+  per account, daily limit and minutes-per-patient per doctor; live
+  queue page (Supabase Realtime + 30 s refresh); clinic dashboard
+  `/clinic` for reception (call next, arrived/seen/no-show, walk-ins,
+  cash paid, delays, cancel/close). All booking changes go through
+  database functions (`book`, `call_next`, …); nobody writes the
+  tables directly. Reception staff sign in by phone (WhatsApp code)
+  and are added on the admin Team page by phone number. Doctors only
+  (clinics/hospitals); labs, pharmacies and home visits are later.
+- WhatsApp booking messages are built but OFF
+  (`BOOKING_MESSAGES_ENABLED`), pending the owner's OK (~$0.01/booking).
 - Waiting on the owner: Meta, Vercel and Supabase setup in
-  `docs/whatsapp-login-setup.md` (phone login is off until then).
+  `docs/whatsapp-login-setup.md` (phone login is off until then, so
+  patients and reception can't sign in on the live site yet).
 - Never add made-up hospitals or phone numbers to the database; only
   details the owner has confirmed.
-- Next: Milestone 4, booking, queue numbers, live queue and the clinic
-  reception dashboard (cash at reception only).
+- Next: Milestone 5, labs, pharmacies and home visits; then medical
+  records, prescriptions and ratings.

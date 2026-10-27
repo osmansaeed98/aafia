@@ -24,6 +24,10 @@ export default function DoctorForm({ t, lang, doctor, placeId, specialties }) {
         </select>
       </label>
       <Field label={f.fee} optional={f.optional} placeholder={x.fee} name="fee_sdg" inputMode="numeric" defaultValue={d.fee_sdg ?? ""} dir="ltr" />
+      <div className="pair">
+        <Field label={f.dailyLimit} name="daily_limit" inputMode="numeric" defaultValue={d.daily_limit ?? 30} required dir="ltr" />
+        <Field label={f.minutesPerPatient} name="minutes_per_patient" inputMode="numeric" defaultValue={d.minutes_per_patient ?? 15} required dir="ltr" />
+      </div>
       <Check label={f.isActive} name="is_active" defaultChecked={d.is_active} />
       <button className="button button-solid">{d.id ? t.save : t.doctors.add}</button>
     </form>

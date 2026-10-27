@@ -81,3 +81,21 @@ a screenshot.
 
 SMS backup stays **off** until the owner approves it with a monthly cap
 (SMS to Sudan is about $0.47 a message).
+
+## F. Booking messages on WhatsApp (built, switched OFF)
+
+A confirmation when someone books, and "your turn is coming" when they
+are 3 numbers away. About $0.0046 per message (Meta "utility" rate),
+so about $0.01 per booking — roughly $30 a month at 3,000 bookings.
+Patients see everything in the app either way. Only switch on after
+the owner approves the cost:
+
+1. WhatsApp Manager → Message templates → Create, category **Utility**,
+   language **Arabic**:
+   - `aafia_booking_confirmed` with 4 variables: {{1}} name, {{2}}
+     doctor, {{3}} day, {{4}} queue number. Example text:
+     "اتحجزت نمرة {{4}} لـ {{1}} مع {{2}} يوم {{3}}. الدفع كاش في الاستقبال."
+   - `aafia_turn_soon` with 2 variables: {{1}} queue number, {{2}}
+     doctor. Example text: "نمرة {{1}} مع {{2}}: دورك قرب، فضل 3 قبلك."
+2. When both are **Active**: Vercel → Environment Variables →
+   `BOOKING_MESSAGES_ENABLED` = `true` → Redeploy.

@@ -12,13 +12,12 @@ export default async function Home() {
       </section>
 
       <div className="actions">
-        <div className="action action-primary" aria-disabled="true">
+        <Link href="/book" className="action action-primary">
           <span>
             <span className="action-title">{t.book}</span>
             <span className="action-hint">{t.bookHint}</span>
           </span>
-          <span className="badge">{t.comingSoon}</span>
-        </div>
+        </Link>
 
         <Link href="/emergency" className="action action-danger">
           <span>

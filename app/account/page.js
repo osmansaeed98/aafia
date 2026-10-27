@@ -1,3 +1,4 @@
+import { formatDay } from "@/lib/booking";
 import { formatSudanPhone } from "@/lib/phone";
 import { getDictionary, getLang } from "@/lib/i18n";
 import { requirePatient } from "@/lib/patient/auth";
@@ -60,13 +61,24 @@ function RelationField({ t, value = "" }) {
 }
 
 export default async function Account({ searchParams }) {
-  const t = getDictionary(await getLang()).patient.account;
+  const lang = await getLang();
+  const dict = getDictionary(lang);
+  const t = dict.patient.account;
+  const tb = dict.booking;
   const { supabase, user } = await requirePatient();
   const { ok, error } = await searchParams;
-  const [{ data: profile }, { data: familyData }] = await Promise.all([
+  const [{ data: profile }, { data: familyData }, { data: bookingsData }, { data: team }] = await Promise.all([
     supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("family_members").select("*").order("created_at"),
+    supabase
+      .from("bookings")
+      .select("id, queue_number, status, patient_name, sessions(session_date, starts_at, doctors(name_ar, name_en))")
+      .eq("booked_by", user.id)
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabase.from("team_members").select("role").eq("user_id", user.id).maybeSingle(),
   ]);
+  const bookings = bookingsData ?? [];
   const family = familyData ?? [];
 
   const alert = error ? (
@@ -83,6 +95,11 @@ export default async function Account({ searchParams }) {
   if (!profile) {
     return (
       <div className="admin narrow">
+        {team && (
+          <a href="/clinic" className="button button-solid clinic-link">
+            {tb.clinicDashboard}
+          </a>
+        )}
         <h1>{t.setupTitle}</h1>
         <p className="muted">{t.setupHint}</p>
         {alert}
@@ -100,6 +117,46 @@ export default async function Account({ searchParams }) {
         {t.hello} {profile.full_name}
       </h1>
       {alert}
+
+      {team && (
+        <a href="/clinic" className="button button-solid clinic-link">
+          {tb.clinicDashboard}
+        </a>
+      )}
+
+      <section className="card">
+        <div className="title-row">
+          <h2>{tb.myBookings}</h2>
+          <a href="/book" className="button button-small">
+            {tb.bookNew}
+          </a>
+        </div>
+        {bookings.length === 0 ? (
+          <p className="muted">{tb.noBookings}</p>
+        ) : (
+          <ul className="rows">
+            {bookings.map((b) => (
+              <li key={b.id}>
+                <a href={`/bookings/${b.id}`} className="row row-link">
+                  <span>
+                    <strong>
+                      {tb.yourNumber} {b.queue_number}
+                    </strong>
+                    <small className="muted">
+                      {" "}
+                      · {lang === "en" ? b.sessions?.doctors?.name_en : b.sessions?.doctors?.name_ar} ·{" "}
+                      {formatDay(b.sessions?.session_date, lang)} · {b.patient_name}
+                    </small>
+                  </span>
+                  <span className={["booked", "arrived"].includes(b.status) ? "chip" : "chip chip-muted"}>
+                    {tb.statuses[b.status]}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section className="card">
         <details>

@@ -593,3 +593,221 @@ details[open] > .form {
 .admin > p.muted {
   margin-bottom: 12px;
 }
+
+/* Booking */
+.specialty {
+  display: block;
+  margin: 2px 0;
+}
+
+.specialty small {
+  display: block;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.doctor-row > span:first-child {
+  display: grid;
+}
+
+.fee-line {
+  margin: 12px 0;
+}
+
+.slots {
+  display: grid;
+  gap: 8px;
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  background: var(--white);
+  cursor: pointer;
+}
+
+.slot > span {
+  display: grid;
+}
+
+.slot small {
+  color: var(--ink-muted);
+}
+
+.slot input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--nile);
+}
+
+.slot:has(input:checked) {
+  border-color: var(--nile);
+  background: var(--nile-soft);
+}
+
+.slot-off {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Live queue */
+.queue-card {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 20px 16px;
+  border-radius: var(--radius-l);
+  background: var(--nile);
+  color: var(--white);
+  text-align: center;
+}
+
+.queue-numbers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.queue-numbers > div {
+  display: grid;
+}
+
+.queue-label {
+  color: var(--nile-soft);
+  font-size: 15px;
+}
+
+.queue-big {
+  font-size: 56px;
+  line-height: 1.1;
+}
+
+.queue-serving {
+  color: var(--saffron-soft);
+}
+
+.queue-headline {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.queue-turn {
+  padding: 8px;
+  border-radius: var(--radius-m);
+  background: var(--saffron);
+  color: var(--ink);
+}
+
+.queue-delay,
+.queue-notice {
+  padding: 8px 12px;
+  border-radius: var(--radius-s);
+  background: var(--saffron-soft);
+  color: var(--saffron-ink);
+}
+
+.queue-card .footnote {
+  margin: 0;
+  color: var(--nile-soft);
+}
+
+.call-next {
+  width: 100%;
+  min-height: 64px;
+  border-color: var(--saffron);
+  background: var(--saffron);
+  color: var(--ink);
+  font-size: 20px;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 16px 0;
+}
+
+.details dt {
+  color: var(--ink-muted);
+}
+
+.details dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.status-chip {
+  display: inline-block;
+}
+
+.clinic-link {
+  margin: 8px 0;
+}
+
+/* Reception */
+.queue-list {
+  gap: 10px;
+}
+
+.queue-row {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--white);
+}
+
+.queue-row-now {
+  border: 2px solid var(--saffron);
+  background: var(--saffron-soft);
+}
+
+.queue-no {
+  display: inline-block;
+  min-width: 36px;
+  color: var(--nile);
+  font-size: 22px;
+}
+
+.queue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.pay-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.pay-form input {
+  width: 120px;
+  min-height: var(--tap);
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  font: inherit;
+}
+
+.session-card .button {
+  margin-top: 8px;
+}
+
+.session-actions {
+  margin-top: 16px;
+}
+
+.chip {
+  white-space: nowrap;
+}
+
+.queue-row .chip-muted {
+  margin-inline-start: 6px;
+}
