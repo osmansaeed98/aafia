@@ -221,3 +221,50 @@ export async function removeTeamMember(form) {
     return "/admin/team?ok=deleted";
   });
 }
+
+// Labs --------------------------------------------------------------------
+
+export async function saveLabTest(form) {
+  await adminChange(form, "/admin/places", async (supabase, back) => {
+    const row = {
+      place_id: number(form, "place_id", { required: true, integer: true }),
+      name_ar: text(form, "name_ar"),
+      name_en: text(form, "name_en"),
+      price_sdg: number(form, "price_sdg", { integer: true, min: 0 }),
+      notes_ar: text(form, "notes_ar", { required: false }),
+      notes_en: text(form, "notes_en", { required: false }),
+      is_active: checkbox(form, "is_active"),
+      sort_order: number(form, "sort_order", { integer: true }) ?? 0,
+    };
+    const id = number(form, "id", { integer: true });
+    check(id ? await supabase.from("lab_tests").update(row).eq("id", id) : await supabase.from("lab_tests").insert(row));
+    return withParam(back, "ok", "saved");
+  });
+}
+
+export async function deleteLabTest(form) {
+  await adminChange(form, "/admin/places", async (supabase, back) => {
+    const id = number(form, "id", { required: true, integer: true });
+    check(await supabase.from("lab_tests").delete().eq("id", id));
+    return withParam(back, "ok", "deleted");
+  });
+}
+
+// The lab's queue: numbers per day and minutes per patient.
+export async function saveLabQueue(form) {
+  await adminChange(form, "/admin/places", async (supabase, back) => {
+    const placeId = number(form, "place_id", { required: true, integer: true });
+    const { data, error } = await supabase
+      .from("doctors")
+      .update({
+        daily_limit: number(form, "daily_limit", { required: true, integer: true, min: 1, max: 200 }),
+        minutes_per_patient: number(form, "minutes_per_patient", { required: true, integer: true, min: 3, max: 120 }),
+      })
+      .eq("place_id", placeId)
+      .eq("is_lab_desk", true)
+      .select("id");
+    check({ error });
+    if (!data?.length) throw new Error("lab queue not found");
+    return withParam(back, "ok", "saved");
+  });
+}

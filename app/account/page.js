@@ -67,7 +67,7 @@ export default async function Account({ searchParams }) {
   const tb = dict.booking;
   const { supabase, user } = await requirePatient();
   const { ok, error } = await searchParams;
-  const [{ data: profile }, { data: familyData }, { data: bookingsData }, { data: team }] = await Promise.all([
+  const [{ data: profile }, { data: familyData }, { data: bookingsData }, { data: team }, { data: medicinesData }, { data: visitsData }] = await Promise.all([
     supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("family_members").select("*").order("created_at"),
     supabase
@@ -77,8 +77,24 @@ export default async function Account({ searchParams }) {
       .order("created_at", { ascending: false })
       .limit(20),
     supabase.from("team_members").select("role").eq("user_id", user.id).maybeSingle(),
+    supabase
+      .from("pharmacy_requests")
+      .select("id, status, patient_name, created_at, places(name_ar, name_en)")
+      .eq("requested_by", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
+    supabase
+      .from("home_visit_requests")
+      .select("id, status, patient_name, preferred_date, places(name_ar, name_en)")
+      .eq("requested_by", user.id)
+      .order("created_at", { ascending: false })
+      .limit(10),
   ]);
   const bookings = bookingsData ?? [];
+  const medicines = medicinesData ?? [];
+  const visits = visitsData ?? [];
+  const tp = dict.pharmacy;
+  const tv = dict.visits;
   const family = familyData ?? [];
 
   const alert = error ? (
@@ -124,6 +140,10 @@ export default async function Account({ searchParams }) {
         </a>
       )}
 
+      <a href="/records" className="button records-link">
+        {dict.records.title}
+      </a>
+
       <section className="card">
         <div className="title-row">
           <h2>{tb.myBookings}</h2>
@@ -157,6 +177,51 @@ export default async function Account({ searchParams }) {
           </ul>
         )}
       </section>
+
+      {medicines.length > 0 && (
+        <section className="card">
+          <h2>{tp.myRequests}</h2>
+          <ul className="rows">
+            {medicines.map((m) => (
+              <li key={m.id}>
+                <a href={`/requests/medicines/${m.id}`} className="row row-link">
+                  <span>
+                    <strong>{lang === "en" ? m.places?.name_en : m.places?.name_ar}</strong>
+                    <small className="muted"> · {m.patient_name}</small>
+                  </span>
+                  <span className={["sent", "available", "partial"].includes(m.status) ? "chip" : "chip chip-muted"}>
+                    {tp.statuses[m.status]}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {visits.length > 0 && (
+        <section className="card">
+          <h2>{tv.myRequests}</h2>
+          <ul className="rows">
+            {visits.map((v) => (
+              <li key={v.id}>
+                <a href={`/requests/visits/${v.id}`} className="row row-link">
+                  <span>
+                    <strong>{lang === "en" ? v.places?.name_en : v.places?.name_ar}</strong>
+                    <small className="muted">
+                      {" "}
+                      · {formatDay(v.preferred_date, lang)} · {v.patient_name}
+                    </small>
+                  </span>
+                  <span className={["requested", "confirmed"].includes(v.status) ? "chip" : "chip chip-muted"}>
+                    {tv.statuses[v.status]}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="card">
         <details>

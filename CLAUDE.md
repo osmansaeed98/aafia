@@ -123,6 +123,17 @@ on their own computer.
   tables directly. Reception staff sign in by phone (WhatsApp code)
   and are added on the admin Team page by phone number. Doctors only
   (clinics/hospitals); labs, pharmacies and home visits are later.
+- Milestone 5 done: labs (queue numbers via one automatic "lab desk"
+  per lab place + admin-managed price list), pharmacies (patient sends
+  a prescription photo, shrunk on the phone, and/or a typed list; the
+  pharmacy replies available/partial/unavailable with total and ready
+  time; pickup and cash only; photos in the private "prescriptions"
+  storage bucket, max 30 per account, readable only by the patient and
+  that pharmacy) and home visits (request with reason, preferred day and
+  time, address and optional GPS; the clinic confirms time and fee or
+  declines; cash at the visit). Staff handle these on `/clinic`.
+  Supabase refuses SQL deletes of stored files: remove files through the
+  Storage API as their owner (see `removeOwnPhotos` in tests/app/helpers.js).
 - WhatsApp booking messages are built but OFF
   (`BOOKING_MESSAGES_ENABLED`), pending the owner's OK (~$0.01/booking).
 - Waiting on the owner: Meta, Vercel and Supabase setup in
@@ -130,5 +141,14 @@ on their own computer.
   patients and reception can't sign in on the live site yet).
 - Never add made-up hospitals or phone numbers to the database; only
   details the owner has confirmed.
-- Next: Milestone 5, labs, pharmacies and home visits; then medical
-  records, prescriptions and ratings.
+- Milestone 6 done: "My medical file" `/records` (lab results,
+  prescriptions, reports per person; reception adds files to an app
+  booking on the session page; patients add/delete their own; files in
+  the private "medical-files" bucket, opened via `/records/<id>/file`
+  short-lived links). Only the patient and that place's reception see a
+  record; Aafia admins do NOT. A prescription can be sent from the file to
+  a pharmacy (that pharmacy sees just that one; sent ones can't be
+  deleted). Ratings: 1-5 stars + private comment after a completed visit,
+  medicine pickup or home visit, once, within 60 days; public stars only
+  after 3 ratings; admins read comments on `/admin/ratings`.
+- Next: owner's choice (e.g. finish the WhatsApp setup and launch prep).

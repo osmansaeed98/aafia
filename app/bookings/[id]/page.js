@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import RatingForm from "@/components/RatingForm";
 import LiveQueue from "@/components/LiveQueue";
 import { formatDay } from "@/lib/booking";
 import { formatClock, formatMoney } from "@/lib/format";
@@ -12,7 +13,7 @@ export default async function BookingPage({ params, searchParams }) {
   const lang = await getLang();
   const t = getDictionary(lang).booking;
   const { id } = await params;
-  const { ok, error } = await searchParams;
+  const { ok, error, rating } = await searchParams;
   if (!/^\d+$/.test(id)) notFound();
   const { supabase } = await requirePatient(`/bookings/${id}`);
 
@@ -24,6 +25,10 @@ export default async function BookingPage({ params, searchParams }) {
     .eq("id", id)
     .maybeSingle();
   if (!booking) notFound();
+  const done = booking.status === "seen";
+  const { data: myRating } = done
+    ? await supabase.from("ratings").select("stars, comment").eq("booking_id", booking.id).maybeSingle()
+    : { data: null };
   const s = booking.sessions;
   const doctor = s.doctors;
   const place = doctor?.places;
@@ -87,6 +92,9 @@ export default async function BookingPage({ params, searchParams }) {
             <button className="button button-danger">{t.cancel}</button>
           </form>
         </details>
+      )}
+      {done && (
+        <RatingForm kind="booking" id={booking.id} existing={myRating} note={rating} title={getDictionary(lang).ratings.title} t={getDictionary(lang).ratings} />
       )}
       <a href="/account" className="back-link">
         {t.myBookings}

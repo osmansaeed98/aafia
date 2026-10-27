@@ -1,9 +1,14 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { sendTurnSoon, TURN_SOON_AHEAD } from "@/lib/booking-messages";
+import { sendRequestUpdate, sendTurnSoon, TURN_SOON_AHEAD } from "@/lib/booking-messages";
+import { formatDateTime } from "@/lib/datetime";
+import { formatMoney } from "@/lib/format";
+import ar from "@/lib/i18n/ar";
 import { getStaff } from "@/lib/clinic/auth";
+import { khartoumInputToIso } from "@/lib/datetime";
 import { normalizeDigits } from "@/lib/format";
+import { recordFields, uploadMedicalFile } from "@/lib/medical-files";
 import { normalizeSudanPhone } from "@/lib/phone";
 
 const id = (form, name) => {
@@ -94,4 +99,89 @@ export async function updateSession(form) {
     p_notice: String(form.get("notice") ?? ""),
   });
   back(sessionId, error ? "error=1" : "ok=done");
+}
+
+// Pharmacy: reply to a medicine request.
+export async function answerMedicines(form) {
+  const { supabase } = await getStaff();
+  const requestId = id(form, "request_id");
+  const total = String(form.get("total") ?? "").trim();
+  const amount = total ? Number(normalizeDigits(total).replace(/[,\s]/g, "")) : null;
+  const readyAt = khartoumInputToIso(form.get("ready_at"));
+  if (amount !== null && (!Number.isInteger(amount) || amount < 0)) redirect(`/clinic/medicines/${requestId}?error=1`);
+  const { error } = await supabase.rpc("answer_medicines", {
+    p_request_id: requestId,
+    p_status: String(form.get("status")),
+    p_total: amount,
+    p_ready_at: readyAt,
+    p_note: String(form.get("note") ?? ""),
+  });
+  if (!error) await notifyPatient(supabase, "pharmacy_requests", requestId);
+  redirect(`/clinic/medicines/${requestId}?${error ? "error=1" : "ok=done"}`);
+}
+
+// Home visits: confirm (time + fee), decline (reason) or mark done.
+export async function answerHomeVisit(form) {
+  const { supabase } = await getStaff();
+  const requestId = id(form, "request_id");
+  const status = String(form.get("status"));
+  const fee = String(form.get("fee") ?? "").trim();
+  const amount = fee ? Number(normalizeDigits(fee).replace(/[,\s]/g, "")) : null;
+  const visitAt = khartoumInputToIso(form.get("visit_at"));
+  if ((amount !== null && (!Number.isInteger(amount) || amount < 0)) || (status === "confirmed" && !visitAt)) {
+    redirect(`/clinic/visits/${requestId}?error=1`);
+  }
+  const { error } = await supabase.rpc("answer_home_visit", {
+    p_request_id: requestId,
+    p_status: status,
+    p_visit_at: visitAt,
+    p_fee: amount,
+    p_note: String(form.get("note") ?? ""),
+  });
+  if (!error) await notifyPatient(supabase, "home_visit_requests", requestId);
+  redirect(`/clinic/visits/${requestId}?${error ? "error=1" : "ok=done"}`);
+}
+
+// WhatsApp update to the patient (switched off until approved; never
+// blocks the reply).
+async function notifyPatient(supabase, table, requestId) {
+  const pharmacy = table === "pharmacy_requests";
+  const { data: r } = await supabase
+    .from(table)
+    .select(pharmacy ? "status, total_sdg, patient_phone, places(name_ar)" : "status, visit_at, fee_sdg, patient_phone, places(name_ar)")
+    .eq("id", requestId)
+    .maybeSingle();
+  if (!r?.patient_phone || r.status === "collected" || r.status === "done") return;
+  const statuses = pharmacy ? ar.pharmacy.statuses : ar.visits.statuses;
+  const extra = pharmacy
+    ? r.total_sdg !== null ? ` – ${formatMoney(r.total_sdg, "ar")}` : ""
+    : r.visit_at ? ` – ${formatDateTime(r.visit_at, "ar")}` : "";
+  await sendRequestUpdate({ phone: r.patient_phone, place: r.places?.name_ar ?? "", update: `${statuses[r.status]}${extra}` });
+}
+
+// A lab result, prescription or report for a patient's booking: stored
+// in the place's private folder and shown in the patient's medical file.
+export async function staffAddRecord(form) {
+  const { supabase } = await getStaff();
+  const sessionId = id(form, "session_id");
+  const placeId = id(form, "place_id");
+  const fields = recordFields(form);
+  if (!placeId || fields.p_title.length < 2) back(sessionId, "error=1");
+  const path = await uploadMedicalFile(supabase, form, `place-${placeId}`);
+  if (!path) back(sessionId, "error=file");
+  const { error } = await supabase.rpc("staff_add_record", { p_booking_id: id(form, "booking_id"), p_file_path: path, ...fields });
+  if (error) {
+    await supabase.storage.from("medical-files").remove([path]);
+    back(sessionId, "error=1");
+  }
+  back(sessionId, "ok=record");
+}
+
+export async function staffDeleteRecord(form) {
+  const { supabase } = await getStaff();
+  const sessionId = id(form, "session_id");
+  const { data: path, error } = await supabase.rpc("delete_record", { p_record_id: id(form, "record_id") });
+  if (error) back(sessionId, "error=1");
+  await supabase.storage.from("medical-files").remove([path]);
+  back(sessionId, "ok=done");
 }

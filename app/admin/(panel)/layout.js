@@ -33,6 +33,7 @@ export default async function AdminLayout({ children }) {
         <Link href="/admin/specialties">{t.nav.specialties}</Link>
         <Link href="/admin/emergency">{t.nav.emergency}</Link>
         <Link href="/admin/team">{t.nav.team}</Link>
+        <Link href="/admin/ratings">{t.nav.ratings}</Link>
         {signOutForm}
       </nav>
       {children}

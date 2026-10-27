@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { formatMoney } from "@/lib/format";
+import Stars from "@/components/Stars";
 import { getDictionary, getLang } from "@/lib/i18n";
+import { ratingSummary } from "@/lib/ratings";
 import { createSupabasePublic } from "@/lib/supabase/server";
 
 export const metadata = { title: "احجز | Aafia" };
@@ -15,15 +17,18 @@ export default async function BookList({ searchParams }) {
   const { q = "", specialty = "" } = await searchParams;
   const supabase = createSupabasePublic();
 
-  const [{ data: doctorsData }, { data: specialtiesData }] = await Promise.all([
+  const [{ data: doctorsData }, { data: specialtiesData }, ratings] = await Promise.all([
     supabase
       .from("doctors")
       .select("id, name_ar, name_en, fee_sdg, specialty_id, specialties(name_ar, name_en), places!inner(name_ar, name_en, area_ar, area_en, kind)")
       .in("places.kind", BOOKABLE)
+      .eq("is_lab_desk", false)
       .order("name_ar")
       .limit(500),
     supabase.from("specialties").select("id, name_ar, name_en").order("name_ar"),
+    ratingSummary(supabase),
   ]);
+  const tr = getDictionary(lang).ratings;
   const specialties = specialtiesData ?? [];
   const term = q.trim().toLowerCase();
   const doctors = (doctorsData ?? []).filter(
@@ -74,6 +79,7 @@ export default async function BookList({ searchParams }) {
                     {lang === "en" ? d.places.name_en : d.places.name_ar} ·{" "}
                     {lang === "en" ? d.places.area_en : d.places.area_ar}
                   </small>
+                  <Stars summary={ratings.doctors.get(d.id)} t={tr} />
                 </span>
                 <span className="chip">{d.fee_sdg === null ? t.noFee : formatMoney(d.fee_sdg, lang)}</span>
               </Link>

@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import AutoRefresh from "@/components/AutoRefresh";
+import PrescriptionPhoto from "@/components/PrescriptionPhoto";
 import { formatDay } from "@/lib/booking";
 import { canManage, getStaff } from "@/lib/clinic/auth";
 import { formatClock, formatMoney, telHref } from "@/lib/format";
 import { getDictionary, getLang } from "@/lib/i18n";
+import { MAX_MEDICAL_FILE, RECORD_KINDS } from "@/lib/medical-files";
 import { formatSudanPhone } from "@/lib/phone";
-import { addWalkIn, callNext, markPaid, setBookingStatus, updateSession } from "../../actions";
+import { addWalkIn, callNext, markPaid, setBookingStatus, staffAddRecord, staffDeleteRecord, updateSession } from "../../actions";
 
 export const metadata = { robots: { index: false } };
 
@@ -24,6 +26,7 @@ export default async function ClinicSession({ params, searchParams }) {
   const lang = await getLang();
   const t = getDictionary(lang).clinic;
   const tb = getDictionary(lang).booking;
+  const tr = getDictionary(lang).records;
   const { id } = await params;
   const { ok, error } = await searchParams;
   if (!/^\d+$/.test(id)) notFound();
@@ -42,6 +45,17 @@ export default async function ClinicSession({ params, searchParams }) {
     .eq("session_id", id)
     .order("queue_number");
   const bookings = (bookingsData ?? []).filter((b) => b.status !== "cancelled");
+  // Patients' files are for the place's own reception, not the Aafia team.
+  const placeStaff = team?.role === "reception" && team.place_id === session.doctors?.place_id;
+  // Files this place already added to these patients' medical files.
+  const { data: recordsData } = placeStaff && bookings.length
+    ? await supabase
+        .from("medical_records")
+        .select("id, booking_id, kind, title")
+        .in("booking_id", bookings.map((b) => b.id))
+        .order("created_at")
+    : { data: [] };
+  const records = recordsData ?? [];
   const fee = session.doctors?.fee_sdg;
   const running = !["cancelled", "closed"].includes(session.status);
 
@@ -58,10 +72,12 @@ export default async function ClinicSession({ params, searchParams }) {
       </p>
       {ok && (
         <p className="alert alert-ok" role="status">
-          {ok === "nobody" ? t.nobodyWaiting : t.done}
+          {ok === "nobody" ? t.nobodyWaiting : ok === "record" ? tr.staff.added : t.done}
         </p>
       )}
-      {error && <p className="alert alert-error">{error === "phone" ? t.phoneError : t.error}</p>}
+      {error && (
+        <p className="alert alert-error">{error === "phone" ? t.phoneError : error === "file" ? tr.errors.file : t.error}</p>
+      )}
 
       <section className="queue-card">
         <span className="queue-label">{t.nowServing}</span>
@@ -121,6 +137,70 @@ export default async function ClinicSession({ params, searchParams }) {
                     </form>
                   )}
                 </div>
+                {records.some((r) => r.booking_id === b.id) && (
+                  <ul className="record-files">
+                    {records
+                      .filter((r) => r.booking_id === b.id)
+                      .map((r) => (
+                        <li key={r.id} className="row">
+                          <a href={`/records/${r.id}/file`} target="_blank" rel="noopener">
+                            {tr.kinds[r.kind]} · {r.title}
+                          </a>
+                          <details className="confirm-delete">
+                            <summary>{tr.staff.remove}</summary>
+                            <form action={staffDeleteRecord}>
+                              <input type="hidden" name="session_id" value={session.id} />
+                              <input type="hidden" name="record_id" value={r.id} />
+                              <p>{tr.staff.confirmRemove}</p>
+                              <button className="button button-danger">{tr.staff.remove}</button>
+                            </form>
+                          </details>
+                        </li>
+                      ))}
+                  </ul>
+                )}
+                {placeStaff && b.source === "app" ? (
+                  <details className="add-more">
+                    <summary className="button button-small">{tr.staff.add}</summary>
+                    <form action={staffAddRecord} className="form">
+                      <Hidden sessionId={session.id} bookingId={b.id} />
+                      <input type="hidden" name="place_id" value={session.doctors?.place_id} />
+                      <label className="field">
+                        <span>{tr.kind}</span>
+                        <select name="kind" defaultValue="lab_result">
+                          {RECORD_KINDS.map((k) => (
+                            <option key={k} value={k}>
+                              {tr.kinds[k]}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="field">
+                        <span>{tr.name}</span>
+                        <input name="title" required minLength={2} maxLength={120} placeholder={tr.nameExample} />
+                      </label>
+                      <PrescriptionPhoto
+                        name="file"
+                        accept="image/*,application/pdf"
+                        maxBytes={MAX_MEDICAL_FILE}
+                        maxSide={2400}
+                        quality={0.85}
+                        required
+                        label={tr.file}
+                        hint={tr.fileHint}
+                        readyLabel={tr.fileReady}
+                        tooBigLabel={tr.errors.file}
+                      />
+                      <label className="field">
+                        <span>
+                          {tr.notes} <small>({tr.optional})</small>
+                        </span>
+                        <input name="notes" maxLength={500} />
+                      </label>
+                      <button className="button button-solid">{tr.staff.add}</button>
+                    </form>
+                  </details>
+                ) : null}
                 {b.paid_amount === null ? (
                   <form action={markPaid} className="pay-form">
                     <Hidden sessionId={session.id} bookingId={b.id} />

@@ -35,14 +35,23 @@ export async function startApp(port) {
   return { base, stop: () => process.kill(-server.pid) };
 }
 
+// Deletes files a test account uploaded (prescription photos by default)
+// through Supabase's file API (the database refuses direct deletes).
+export async function removeOwnPhotos(user, bucket = "prescriptions", folder = user.id) {
+  const client = createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
+  const { error } = await client.auth.signInWithPassword({ email: user.email, password: user.password });
+  if (error) return;
+  const { data } = await client.storage.from(bucket).list(folder);
+  if (data?.length) await client.storage.from(bucket).remove(data.map((f) => `${folder}/${f.name}`));
+}
+
 // The public's view of the database (what anyone on the internet sees).
 export function publicClient() {
   return createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
 }
 
 // Creates a confirmed email+password account. Returns its details.
-export async function createTestUser(name, { admin = false } = {}) {
-  const id = randomUUID();
+export async function createTestUser(name, { admin = false, id = randomUUID() } = {}) {
   const email = `${name}-${id.slice(0, 8)}@${TEST_EMAIL_DOMAIN}`;
   const password = randomBytes(18).toString("base64url");
   await runSql(`
@@ -94,4 +103,20 @@ export async function cleanUp() {
     delete from public.specialties where name_en like 'E2E %';
     delete from auth.users where email like '%@${TEST_EMAIL_DOMAIN}';
   `);
+}
+
+// Nothing on the page sticks out past either edge of a phone screen
+// (right-to-left pages overflow to the left, which scrollWidth misses).
+export async function assertFitsScreen(page) {
+  const offenders = await page.evaluate(() => {
+    const w = document.documentElement.clientWidth;
+    return [...document.querySelectorAll("body *")]
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && (r.left < -1 || r.right > w + 1);
+      })
+      .slice(0, 3)
+      .map((el) => `${el.tagName.toLowerCase()}.${el.className}`);
+  });
+  if (offenders.length) throw new Error(`${page.url()} doesn't fit the screen: ${offenders.join(", ")}`);
 }

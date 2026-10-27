@@ -7,7 +7,10 @@ hosted on [Vercel](https://vercel.com), data in [Supabase](https://supabase.com)
 - `app/` – pages: home, offline emergency page (`emergency/`), language
   switch (`lang/`), patient login (`login/`) and account (`account/`),
   admin area (`admin/`), WhatsApp code hook (`api/auth/send-code/`),
-  booking (`book/`, `bookings/`) and the reception dashboard (`clinic/`)
+  booking (`book/`, `bookings/`), labs (`labs/`), pharmacy requests
+  (`pharmacies/`), home visits (`home-visits/`), request status pages
+  (`requests/`), the medical file (`records/`), ratings (`ratings/`)
+  and the staff dashboard (`clinic/`)
 - `components/` – shared page parts; `components/admin/` – admin forms
 - `lib/i18n/` – all wording, Sudanese Arabic (`ar.js`) and English (`en.js`)
 - `lib/format.js` – numbers, times, money (always Western digits)
@@ -15,6 +18,7 @@ hosted on [Vercel](https://vercel.com), data in [Supabase](https://supabase.com)
   `lib/send-code-hook.js` – login codes by WhatsApp
 - `lib/booking.js` – queue position and wait estimate;
   `lib/booking-messages.js` – WhatsApp booking messages (off by default)
+- `lib/medical-files.js` – medical file uploads; `lib/ratings.js` – public stars
 - `lib/supabase/` – database connection; `lib/admin/` – admin checks and form reading
 - `proxy.js` – keeps the team's sign-in fresh on admin pages
 - `public/sw.js` – keeps the emergency page working offline
