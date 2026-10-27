@@ -993,3 +993,30 @@ textarea {
   font-weight: 600;
   overflow-wrap: anywhere;
 }
+
+/* Footer: privacy and terms on every page */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  justify-content: center;
+  padding: 24px 16px 32px;
+  font-size: 0.875rem;
+}
+.footer a {
+  color: var(--ink-muted);
+  min-height: var(--tap);
+  display: inline-flex;
+  align-items: center;
+}
+.delete-account {
+  margin-top: 32px;
+}
+
+/* Privacy and terms */
+.legal h2 {
+  margin-top: 28px;
+}
+.legal li {
+  margin-bottom: 6px;
+}

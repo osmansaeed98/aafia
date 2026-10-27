@@ -97,3 +97,32 @@ export async function signOutPatient() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+// Deletes the patient's account for good, in three steps that can be
+// retried: (1) the database cancels open bookings and requests and clears
+// health details; (2) the files they uploaded, and those clinics added to
+// their medical file, are deleted; (3) the database removes the records,
+// the phone number from clinics' history, and the account.
+export async function deleteMyAccount() {
+  const { supabase, user } = await requirePatient();
+  const { error } = await supabase.rpc("prepare_account_deletion");
+  if (error) redirect(`/account?error=${error.message === "team" ? "team" : "generic"}`);
+  const { data: records } = await supabase.from("medical_records").select("file_path").eq("owner_id", user.id);
+  const results = await Promise.all(
+    ["prescriptions", "medical-files"].map(async (bucket) => {
+      const { data, error: listError } = await supabase.storage.from(bucket).list(user.id, { limit: 1000 });
+      if (listError) return false;
+      const paths = (data ?? []).map((f) => `${user.id}/${f.name}`);
+      if (bucket === "medical-files") paths.push(...(records ?? []).map((r) => r.file_path));
+      const unique = [...new Set(paths)];
+      if (!unique.length) return true;
+      const { error: removeError } = await supabase.storage.from(bucket).remove(unique);
+      return !removeError;
+    }),
+  );
+  if (results.includes(false)) redirect("/account?error=deleteUnfinished");
+  const { error: deleteError } = await supabase.rpc("delete_my_account");
+  if (deleteError) redirect("/account?error=deleteUnfinished");
+  await supabase.auth.signOut({ scope: "local" });
+  redirect("/?deleted=1");
+}

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getDictionary, getLang } from "@/lib/i18n";
 
-export default async function Home() {
+export default async function Home({ searchParams }) {
   const t = getDictionary(await getLang()).home;
+  const { deleted } = await searchParams;
 
   return (
     <>
@@ -10,6 +11,12 @@ export default async function Home() {
         <h1>{t.title}</h1>
         <p>{t.subtitle}</p>
       </section>
+
+      {deleted && (
+        <p className="alert alert-ok" role="status">
+          {t.accountDeleted}
+        </p>
+      )}
 
       <div className="actions">
         <Link href="/book" className="action action-primary">

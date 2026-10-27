@@ -9,7 +9,8 @@ hosted on [Vercel](https://vercel.com), data in [Supabase](https://supabase.com)
   admin area (`admin/`), WhatsApp code hook (`api/auth/send-code/`),
   booking (`book/`, `bookings/`), labs (`labs/`), pharmacy requests
   (`pharmacies/`), home visits (`home-visits/`), request status pages
-  (`requests/`), the medical file (`records/`), ratings (`ratings/`)
+  (`requests/`), the medical file (`records/`), ratings (`ratings/`),
+  privacy and terms (`privacy/`, `terms/`, text in `lib/legal.js`)
   and the staff dashboard (`clinic/`)
 - `components/` – shared page parts; `components/admin/` – admin forms
 - `lib/i18n/` – all wording, Sudanese Arabic (`ar.js`) and English (`en.js`)
@@ -28,4 +29,5 @@ hosted on [Vercel](https://vercel.com), data in [Supabase](https://supabase.com)
   phone-sized browser (uses temporary test accounts, removed afterwards)
 
 Settings the app needs are listed in `.env.example`. Switching on
-WhatsApp login: `docs/whatsapp-login-setup.md`.
+WhatsApp login: `docs/whatsapp-login-setup.md`. Team sign-in email:
+`docs/admin-email-setup.md`. Before launch: `docs/launch-checklist.md`.

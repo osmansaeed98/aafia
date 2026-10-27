@@ -39,7 +39,7 @@ export default async function Login({ searchParams }) {
               name="code"
               inputMode="numeric"
               autoComplete="one-time-code"
-              pattern="[0-9٠-٩ ]{4,12}"
+              pattern="[0-9٠-٩۰-۹ ]{4,12}"
               maxLength={12}
               required
               dir="ltr"
@@ -83,7 +83,9 @@ export default async function Login({ searchParams }) {
         </label>
         <button className="button button-solid">{t.sendCode}</button>
       </form>
-      <p className="footnote">{t.privacy}</p>
+      <p className="footnote">
+        {t.privacy} <a href="/privacy">{t.privacyLink}</a>
+      </p>
     </div>
   );
 }

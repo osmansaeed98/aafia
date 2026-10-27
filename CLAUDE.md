@@ -151,4 +151,13 @@ on their own computer.
   deleted). Ratings: 1-5 stars + private comment after a completed visit,
   medicine pickup or home visit, once, within 60 days; public stars only
   after 3 ratings; admins read comments on `/admin/ratings`.
-- Next: owner's choice (e.g. finish the WhatsApp setup and launch prep).
+- Milestone 7 done (launch prep): `/privacy` and `/terms` (plain-language
+  drafts in `lib/legal.js`, linked in the footer and on login; contact
+  email from optional `NEXT_PUBLIC_CONTACT_EMAIL`); admin login accepts
+  the typed code from the email (works once the owner follows
+  `docs/admin-email-setup.md`: free Brevo SMTP + bilingual template);
+  patients can delete their account from `/account`
+  (`prepare_account_deletion` → app deletes their files → `delete_my_account`;
+  clinics keep only name, number and date; team accounts can't).
+  Owner's remaining steps: `docs/launch-checklist.md`.
+- Next: owner's launch steps; chatbot only when the owner asks.

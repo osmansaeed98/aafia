@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { normalizeDigits } from "@/lib/format";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 function cleanEmail(form) {
@@ -24,9 +25,9 @@ async function siteOrigin() {
   return `${proto}://${host}`;
 }
 
-// Emails a sign-in link. Opening it lands on /admin/auth/callback, which
-// finishes the sign-in. (A typed code comes later, with our own email
-// service: Supabase's built-in email can only send its standard link.)
+// Emails a sign-in link (and, once the email template shows it, a code).
+// Opening the link lands on /admin/auth/callback, which finishes the
+// sign-in; typing the code works in any browser (verifyEmailCode).
 export async function sendLink(form) {
   const email = cleanEmail(form);
   if (!email) redirect("/admin/login?error=send");
@@ -47,6 +48,16 @@ export async function sendLink(form) {
     params.set("reason", String(error.code ?? error.name ?? error.status ?? "unknown").slice(0, 60));
   }
   redirect(`/admin/login?${params}`);
+}
+
+export async function verifyEmailCode(form) {
+  const email = cleanEmail(form);
+  if (!email) redirect("/admin/login?error=send");
+  const token = normalizeDigits(String(form.get("code") ?? "")).replace(/\D/g, "");
+  const supabase = await createSupabaseServer();
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+  if (error) redirect(`/admin/login?${new URLSearchParams({ email, error: "code" })}`);
+  redirect("/admin");
 }
 
 export async function signOut() {

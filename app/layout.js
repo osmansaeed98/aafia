@@ -1,4 +1,5 @@
 import { Readex_Pro } from "next/font/google";
+import Link from "next/link";
 import Header from "@/components/Header";
 import RegisterServiceWorker from "@/components/RegisterServiceWorker";
 import { getDictionary, getDir, getLang } from "@/lib/i18n";
@@ -36,6 +37,10 @@ export default async function RootLayout({ children }) {
         <div className="page">
           <Header t={t} lang={lang} />
           <main>{children}</main>
+          <footer className="footer">
+            <Link href="/privacy">{t.footer.privacy}</Link>
+            <Link href="/terms">{t.footer.terms}</Link>
+          </footer>
         </div>
         <RegisterServiceWorker />
       </body>

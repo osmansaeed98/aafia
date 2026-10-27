@@ -6,6 +6,7 @@ import { RELATIONS } from "@/lib/patient/relations";
 import {
   addFamilyMember,
   deleteFamilyMember,
+  deleteMyAccount,
   saveProfile,
   signOutPatient,
   updateFamilyMember,
@@ -297,6 +298,17 @@ export default async function Account({ searchParams }) {
       <form action={signOutPatient}>
         <button className="button">{t.signOut}</button>
       </form>
+
+      <details className="confirm-delete delete-account">
+        <summary>{t.deleteAccount}</summary>
+        <form action={deleteMyAccount}>
+          <p>{t.deleteAccountHint}</p>
+          <p>
+            <strong>{t.confirmDeleteAccount}</strong>
+          </p>
+          <button className="button button-danger">{t.deleteAccount}</button>
+        </form>
+      </details>
     </div>
   );
 }

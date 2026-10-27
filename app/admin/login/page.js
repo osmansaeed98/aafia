@@ -1,5 +1,5 @@
 import { getDictionary, getLang } from "@/lib/i18n";
-import { sendLink } from "./actions";
+import { sendLink, verifyEmailCode } from "./actions";
 
 export const metadata = { robots: { index: false } };
 
@@ -13,7 +13,7 @@ export default async function AdminLogin({ searchParams }) {
 
       {error && (
         <p className="alert alert-error" role="alert">
-          {{ link: t.errorLink, rate: t.errorRate, notAuthorized: t.errorNotAuthorized }[error] ?? t.errorSend}
+          {{ link: t.errorLink, rate: t.errorRate, notAuthorized: t.errorNotAuthorized, code: t.errorCode }[error] ?? t.errorSend}
           {/^[a-z0-9_]{1,40}$/.test(reason ?? "") && (
             <small className="error-reason" dir="ltr">
               {reason}
@@ -22,13 +22,31 @@ export default async function AdminLogin({ searchParams }) {
         </p>
       )}
 
-      {email && !error ? (
+      {email && (!error || error === "code") ? (
         <div className="form">
           <p className="alert alert-ok" role="status">
             {t.linkSent} <strong dir="ltr">{email}</strong>
           </p>
           <p>{t.openLink}</p>
           <p className="muted">{t.sameBrowser}</p>
+          <form action={verifyEmailCode} className="form">
+            <input type="hidden" name="email" value={email} />
+            <label className="field">
+              <span>{t.orCode}</span>
+              <input
+                name="code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9٠-٩۰-۹ ]{6,12}"
+                maxLength={12}
+                required
+                dir="ltr"
+                className="code-input"
+                aria-label={t.code}
+              />
+            </label>
+            <button className="button button-solid">{t.verify}</button>
+          </form>
           <a href="/admin/login" className="back-link">
             {t.otherEmail}
           </a>
