@@ -34,11 +34,12 @@ export default async function EmergencyAdmin({ searchParams }) {
   const t = getDictionary(lang).admin;
   const { supabase } = await getAdminSession();
   const { ok, error } = await searchParams;
-  const { data: depts = [] } = await supabase
+  const { data: deptsData } = await supabase
     .from("emergency_departments")
     .select("*")
     .order("sort_order")
     .order("name_ar");
+  const depts = deptsData ?? [];
 
   return (
     <>

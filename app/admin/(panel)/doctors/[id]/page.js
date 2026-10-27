@@ -15,11 +15,13 @@ export default async function EditDoctor({ params, searchParams }) {
   const { id } = await params;
   const { ok, error } = await searchParams;
 
-  const [{ data: doctor }, { data: hours = [] }, { data: specialties = [] }] = await Promise.all([
+  const [{ data: doctor }, { data: hoursData }, { data: specialtiesData }] = await Promise.all([
     supabase.from("doctors").select("*, places(name_ar, name_en)").eq("id", id).maybeSingle(),
     supabase.from("opening_hours").select("*").eq("doctor_id", id),
     supabase.from("specialties").select("id, name_ar, name_en").order("name_ar"),
   ]);
+  const specialties = specialtiesData ?? [];
+  const hours = hoursData ?? [];
   if (!doctor) notFound();
   const back = `/admin/doctors/${doctor.id}`;
 

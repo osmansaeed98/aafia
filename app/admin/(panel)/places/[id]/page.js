@@ -17,7 +17,7 @@ export default async function EditPlace({ params, searchParams }) {
   const { id } = await params;
   const { ok, error } = await searchParams;
 
-  const [{ data: place }, { data: doctors = [] }, { data: hours = [] }, { data: specialties = [] }] =
+  const [{ data: place }, { data: doctorsData }, { data: hoursData }, { data: specialtiesData }] =
     await Promise.all([
       supabase.from("places").select("*").eq("id", id).maybeSingle(),
       supabase
@@ -28,6 +28,9 @@ export default async function EditPlace({ params, searchParams }) {
       supabase.from("opening_hours").select("*").eq("place_id", id),
       supabase.from("specialties").select("id, name_ar, name_en").order("name_ar"),
     ]);
+  const specialties = specialtiesData ?? [];
+  const hours = hoursData ?? [];
+  const doctors = doctorsData ?? [];
   if (!place) notFound();
   const back = `/admin/places/${place.id}`;
 

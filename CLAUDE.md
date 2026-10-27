@@ -105,10 +105,17 @@ on their own computer.
 - `npm test` runs helper tests, database access-rule tests and the app
   in a phone-sized browser against the real database (temporary test
   accounts and "E2E" entries, removed afterwards).
-- Done: Milestone 1 (look, home page, offline emergency page) and
+- Done: Milestone 1 (look, home page, offline emergency page),
   Milestone 2 (database, access rules, admin area with email-link
-  login). Owner `osmanmohammed98@gmail.com` is the first admin.
+  login; owner `osmanmohammed98@gmail.com` is the first admin) and
+  Milestone 3 code (patient login by WhatsApp code via Supabase's Send
+  SMS hook → `/api/auth/send-code` → Meta WhatsApp Cloud API directly,
+  Sudanese +249 mobiles only; patient profile and family members,
+  private to each patient). Owner chose Meta direct (~$0.005/code)
+  over Twilio; SMS backup stays OFF until approved with a monthly cap.
+- Waiting on the owner: Meta, Vercel and Supabase setup in
+  `docs/whatsapp-login-setup.md` (phone login is off until then).
 - Never add made-up hospitals or phone numbers to the database; only
   details the owner has confirmed.
-- Next: Milestone 3, patient login by WhatsApp code (costs money per
-  message: plan and get the owner's OK on costs first).
+- Next: Milestone 4, booking, queue numbers, live queue and the clinic
+  reception dashboard (cash at reception only).

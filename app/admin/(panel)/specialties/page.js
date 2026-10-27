@@ -9,10 +9,11 @@ export default async function Specialties({ searchParams }) {
   const { supabase } = await getAdminSession();
   const { ok, error } = await searchParams;
   const x = t.examples;
-  const { data: specialties = [] } = await supabase
+  const { data: specialtiesData } = await supabase
     .from("specialties")
     .select("id, name_ar, name_en")
     .order("name_ar");
+  const specialties = specialtiesData ?? [];
 
   return (
     <>

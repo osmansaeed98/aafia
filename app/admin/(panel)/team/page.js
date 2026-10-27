@@ -10,10 +10,12 @@ export default async function Team({ searchParams }) {
   const { supabase, user } = await getAdminSession();
   const { ok, error } = await searchParams;
   const x = t.examples;
-  const [{ data: members = [] }, { data: places = [] }] = await Promise.all([
+  const [{ data: membersData }, { data: placesData }] = await Promise.all([
     supabase.rpc("list_team_members"),
     supabase.from("places").select("id, name_ar, name_en").order("name_ar"),
   ]);
+  const places = placesData ?? [];
+  const members = membersData ?? [];
   const placeName = (id) => {
     const p = places.find((x) => x.id === id);
     return p ? (lang === "en" ? p.name_en : p.name_ar) : "";

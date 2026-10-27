@@ -73,7 +73,8 @@ p {
   text-decoration: none;
 }
 
-.lang-switch {
+.lang-switch,
+.header-pill {
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
@@ -566,4 +567,29 @@ details[open] > .form {
 
 .button-small {
   white-space: nowrap;
+}
+
+.header-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.code-input {
+  font-size: 24px;
+  letter-spacing: 6px;
+  text-align: center;
+}
+
+.resend {
+  margin-top: 12px;
+}
+
+.button-small {
+  flex: 0 0 auto;
+}
+
+.admin > p.muted {
+  margin-bottom: 12px;
 }

@@ -22,7 +22,8 @@ export default async function PlacesList({ searchParams }) {
       ["name_ar", "name_en", "area_ar", "area_en"].map((c) => `${c}.ilike.%${term}%`).join(","),
     );
   }
-  const { data: places = [] } = await query;
+  const { data: placesData } = await query;
+  const places = placesData ?? [];
 
   return (
     <>
