@@ -90,3 +90,25 @@ on their own computer.
   that are not committed.
 - After each milestone: run it, write short tests, commit with a
   clear message.
+
+## Where we are (update at the end of each milestone)
+
+- Live site: https://aafia-a14h.vercel.app (Vercel, deploys from `main`).
+  Work happens on branch `setup-web-app`; the owner merges it into
+  `main` on GitHub (Compare & pull request → Merge).
+- Supabase project ref: `wexdrgrmkhjlwjklkris` (Frankfurt, free plan).
+  Database changes live in `supabase/migrations/`; apply with
+  `npm run db:migrate`. In Claude's cloud session the Supabase token is
+  added automatically for api.supabase.com (database read/write only;
+  auth settings must be changed by the owner in the dashboard). Node's
+  fetch needs `NODE_USE_ENV_PROXY=1` here (the npm scripts set it).
+- `npm test` runs helper tests, database access-rule tests and the app
+  in a phone-sized browser against the real database (temporary test
+  accounts and "E2E" entries, removed afterwards).
+- Done: Milestone 1 (look, home page, offline emergency page) and
+  Milestone 2 (database, access rules, admin area with email-link
+  login). Owner `osmanmohammed98@gmail.com` is the first admin.
+- Never add made-up hospitals or phone numbers to the database; only
+  details the owner has confirmed.
+- Next: Milestone 3, patient login by WhatsApp code (costs money per
+  message: plan and get the owner's OK on costs first).
