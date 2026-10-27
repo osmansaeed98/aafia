@@ -552,3 +552,18 @@ details[open] > .form {
   font-size: 13px;
   opacity: 0.8;
 }
+
+/* Long emails and names wrap instead of pushing the page sideways. */
+.row {
+  flex-wrap: wrap;
+  padding-block: 8px;
+}
+
+.row > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.button-small {
+  white-space: nowrap;
+}

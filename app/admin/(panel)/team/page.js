@@ -9,6 +9,7 @@ export default async function Team({ searchParams }) {
   const t = getDictionary(lang).admin;
   const { supabase, user } = await getAdminSession();
   const { ok, error } = await searchParams;
+  const x = t.examples;
   const [{ data: members = [] }, { data: places = [] }] = await Promise.all([
     supabase.rpc("list_team_members"),
     supabase.from("places").select("id, name_ar, name_en").order("name_ar"),
@@ -49,7 +50,7 @@ export default async function Team({ searchParams }) {
         <h2>{t.team.add}</h2>
         <p className="muted">{t.team.hint}</p>
         <form action={addTeamMember} className="form">
-          <Field label={t.team.email} name="email" type="email" required dir="ltr" />
+          <Field label={t.team.email} placeholder={x.email} name="email" type="email" required dir="ltr" />
           <label className="field">
             <span>{t.team.role}</span>
             <select name="role" defaultValue="admin">

@@ -63,6 +63,8 @@ test("signed-in people who aren't on the team see no admin pages", async () => {
 test("an admin adds a place, a doctor and hours, and shows the place", async () => {
   const page = await pageAs(admin);
   await page.goto(app.base + "/admin/places/new");
+  assert.match(await page.getAttribute('[name="name_ar"]', "placeholder"), /مثال/, "fields show examples");
+  assert.equal(await page.getAttribute('[name="phone"]', "placeholder"), "0912 345 678");
   await page.selectOption('select[name="kind"]', "clinic");
   await page.fill('[name="name_ar"]', "عيادة اختبار E2E");
   await page.fill('[name="name_en"]', "E2E Test Clinic");
@@ -186,5 +188,15 @@ test("the login page names the reason when a link can't be sent", async () => {
   assert.match(await page.innerText(".alert-error"), /أعضاء حساب Supabase/);
   await page.goto(app.base + "/admin/login?email=a%40b.com&error=send&reason=invalid_api_key");
   assert.match(await page.innerText(".alert-error .error-reason"), /invalid_api_key/);
+  await page.context().close();
+});
+
+test("admin pages never scroll sideways on a phone", async () => {
+  const page = await pageAs(admin);
+  for (const path of ["/admin", "/admin/places", "/admin/places/new", "/admin/specialties", "/admin/emergency", "/admin/team"]) {
+    await page.goto(app.base + path);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    assert.ok(overflow <= 0, `${path} is ${overflow}px too wide`);
+  }
   await page.context().close();
 });
