@@ -19,6 +19,21 @@ export default async function Home() {
           </span>
         </Link>
 
+        <div className="actions-grid">
+          {[
+            ["/labs", t.labs, t.labsHint],
+            ["/pharmacies", t.pharmacy, t.pharmacyHint],
+            ["/home-visits", t.visits, t.visitsHint],
+          ].map(([href, title, hint]) => (
+            <Link key={href} href={href} className="action action-small">
+              <span>
+                <span className="action-title">{title}</span>
+                <span className="action-hint">{hint}</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+
         <Link href="/emergency" className="action action-danger">
           <span>
             <span className="action-title">{t.emergency}</span>

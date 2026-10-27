@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 import { chromium } from "playwright";
 import { literal, runSql } from "../../scripts/supabase-api.js";
-import { cleanUp, createTestUser, phone, sessionCookies, startApp } from "./helpers.js";
+import { assertFitsScreen, cleanUp, createTestUser, phone, sessionCookies, startApp } from "./helpers.js";
 
 let app;
 let browser;
@@ -29,10 +29,7 @@ async function until(check, message, tries = 160) {
   assert.fail(message);
 }
 
-const noSideways = async (page) => {
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
-  assert.ok(overflow <= 0, `${page.url()} is ${overflow}px too wide`);
-};
+const noSideways = assertFitsScreen;
 
 before(async () => {
   await cleanUp();

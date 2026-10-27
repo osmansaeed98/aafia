@@ -20,6 +20,7 @@ export default async function BookList({ searchParams }) {
       .from("doctors")
       .select("id, name_ar, name_en, fee_sdg, specialty_id, specialties(name_ar, name_en), places!inner(name_ar, name_en, area_ar, area_en, kind)")
       .in("places.kind", BOOKABLE)
+      .eq("is_lab_desk", false)
       .order("name_ar")
       .limit(500),
     supabase.from("specialties").select("id, name_ar, name_en").order("name_ar"),

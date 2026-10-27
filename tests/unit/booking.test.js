@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { bookingErrorKey, fill, formatDay, queueState } from "../../lib/booking.js";
-import { bookingMessagesEnabled, sendBookingConfirmed, sendTurnSoon } from "../../lib/booking-messages.js";
+import { bookingMessagesEnabled, sendBookingConfirmed, sendRequestUpdate, sendTurnSoon } from "../../lib/booking-messages.js";
 
 const session = (over = {}) => ({ status: "open", now_serving: 0, delay_minutes: 0, ...over });
 
@@ -48,4 +48,14 @@ test("booking WhatsApp messages stay off unless switched on", async () => {
   // A failing message never throws (the booking must still go through).
   const failed = await sendTurnSoon({ phone: "249912345678", number: 1, doctor: "x" }, { env: on, fetchImpl: async () => new Response("{}", { status: 500 }) });
   assert.deepEqual(failed, { failed: true });
+});
+
+test("pharmacy and home-visit updates use the same off switch", async () => {
+  let calls = 0;
+  const fetchImpl = async (url, init) => { calls++; return new Response("{}", { status: 200 }); };
+  const env = { WHATSAPP_TOKEN: "t", WHATSAPP_PHONE_NUMBER_ID: "1" };
+  await sendRequestUpdate({ phone: "249912345678", place: "صيدلية", update: "متوفر" }, { env, fetchImpl });
+  assert.equal(calls, 0, "off by default");
+  await sendRequestUpdate({ phone: "249912345678", place: "صيدلية", update: "متوفر" }, { env: { ...env, BOOKING_MESSAGES_ENABLED: "true" }, fetchImpl });
+  assert.equal(calls, 1);
 });

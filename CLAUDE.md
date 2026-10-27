@@ -123,6 +123,17 @@ on their own computer.
   tables directly. Reception staff sign in by phone (WhatsApp code)
   and are added on the admin Team page by phone number. Doctors only
   (clinics/hospitals); labs, pharmacies and home visits are later.
+- Milestone 5 done: labs (queue numbers via one automatic "lab desk"
+  per lab place + admin-managed price list), pharmacies (patient sends
+  a prescription photo, shrunk on the phone, and/or a typed list; the
+  pharmacy replies available/partial/unavailable with total and ready
+  time; pickup and cash only; photos in the private "prescriptions"
+  storage bucket, max 30 per account, readable only by the patient and
+  that pharmacy) and home visits (request with reason, preferred day and
+  time, address and optional GPS; the clinic confirms time and fee or
+  declines; cash at the visit). Staff handle these on `/clinic`.
+  Supabase refuses SQL deletes of stored files: remove files through the
+  Storage API as their owner (see `removeOwnPhotos` in tests/app/helpers.js).
 - WhatsApp booking messages are built but OFF
   (`BOOKING_MESSAGES_ENABLED`), pending the owner's OK (~$0.01/booking).
 - Waiting on the owner: Meta, Vercel and Supabase setup in
@@ -130,5 +141,5 @@ on their own computer.
   patients and reception can't sign in on the live site yet).
 - Never add made-up hospitals or phone numbers to the database; only
   details the owner has confirmed.
-- Next: Milestone 5, labs, pharmacies and home visits; then medical
-  records, prescriptions and ratings.
+- Next: Milestone 6, medical records (incl. lab results), prescriptions
+  and ratings.

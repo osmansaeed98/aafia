@@ -99,3 +99,8 @@ the owner approves the cost:
      doctor. Example text: "نمرة {{1}} مع {{2}}: دورك قرب، فضل 3 قبلك."
 2. When both are **Active**: Vercel → Environment Variables →
    `BOOKING_MESSAGES_ENABLED` = `true` → Redeploy.
+
+The same switch also sends pharmacy replies and home-visit
+confirmations ("aafia_request_update", Utility, Arabic, 2 variables:
+{{1}} place, {{2}} what happened). Example text:
+"رد من {{1}} على طلبك: {{2}}. التفاصيل في تطبيق عافية."

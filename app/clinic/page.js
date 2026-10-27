@@ -1,4 +1,6 @@
-import { fill } from "@/lib/booking";
+import AutoRefresh from "@/components/AutoRefresh";
+import { fill, formatDay } from "@/lib/booking";
+import { formatDateTime } from "@/lib/datetime";
 import { getStaff, khartoumToday } from "@/lib/clinic/auth";
 import { formatClock } from "@/lib/format";
 import { getDictionary, getLang } from "@/lib/i18n";
@@ -25,14 +27,39 @@ export default async function Clinic({ searchParams }) {
   let places = [];
   let placeId = team.place_id;
   if (team.role === "admin") {
-    const { data } = await supabase.from("places").select("id, name_ar, name_en").in("kind", ["clinic", "hospital"]).order("name_ar");
+    const { data } = await supabase.from("places").select("id, name_ar, name_en").order("name_ar");
     places = data ?? [];
     placeId = Number(placeParam) || places[0]?.id || null;
   }
   const today = khartoumToday();
 
-  const { data: todayData } = placeId ? await supabase.rpc("clinic_today", { p_place_id: placeId }) : { data: [] };
+  const { data: place } = placeId
+    ? await supabase.from("places").select("kind, home_visits").eq("id", placeId).maybeSingle()
+    : { data: null };
+  const isPharmacy = place?.kind === "pharmacy";
+  const [{ data: todayData }, { data: medicinesData }, { data: visitsData }] = await Promise.all([
+    placeId && !isPharmacy ? supabase.rpc("clinic_today", { p_place_id: placeId }) : { data: [] },
+    isPharmacy
+      ? supabase
+          .from("pharmacy_requests")
+          .select("id, status, patient_name, created_at")
+          .eq("place_id", placeId)
+          .in("status", ["sent", "available", "partial"])
+          .order("created_at")
+      : { data: [] },
+    place?.home_visits
+      ? supabase
+          .from("home_visit_requests")
+          .select("id, status, patient_name, preferred_date, preferred_time, area")
+          .eq("place_id", placeId)
+          .in("status", ["requested", "confirmed"])
+          .order("preferred_date")
+      : { data: [] },
+  ]);
   const cards = todayData ?? [];
+  const medicines = medicinesData ?? [];
+  const visits = visitsData ?? [];
+  const dict = getDictionary(lang);
 
   return (
     <div className="admin">
@@ -50,6 +77,59 @@ export default async function Clinic({ searchParams }) {
         </form>
       )}
       {error && <p className="alert alert-error">{t.error}</p>}
+      {(isPharmacy || place?.home_visits) && <AutoRefresh seconds={60} />}
+
+      {isPharmacy && (
+        <section>
+          <h2>{t.medicines}</h2>
+          {medicines.length === 0 ? (
+            <p className="muted">{t.noRequests}</p>
+          ) : (
+            <ul className="rows">
+              {medicines.map((m) => (
+                <li key={m.id}>
+                  <a href={`/clinic/medicines/${m.id}`} className="row row-link">
+                    <span>
+                      <strong>{m.patient_name}</strong>
+                      <small className="muted"> · {formatDateTime(m.created_at, lang)}</small>
+                    </span>
+                    <span className={m.status === "sent" ? "chip chip-new" : "chip"}>{dict.pharmacy.statuses[m.status]}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {place?.home_visits && (
+        <section>
+          <h2>{t.visits}</h2>
+          {visits.length === 0 ? (
+            <p className="muted">{t.noRequests}</p>
+          ) : (
+            <ul className="rows">
+              {visits.map((v) => (
+                <li key={v.id}>
+                  <a href={`/clinic/visits/${v.id}`} className="row row-link">
+                    <span>
+                      <strong>{v.patient_name}</strong>
+                      <small className="muted">
+                        {" "}
+                        · {formatDay(v.preferred_date, lang)} · {dict.visits.times[v.preferred_time]} · {v.area}
+                      </small>
+                    </span>
+                    <span className={v.status === "requested" ? "chip chip-new" : "chip"}>{dict.visits.statuses[v.status]}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {!isPharmacy && (
+      <>
       <h2>{t.today}</h2>
       {cards.length === 0 ? (
         <p className="muted">{t.noSessions}</p>
@@ -83,6 +163,8 @@ export default async function Clinic({ searchParams }) {
             </li>
           ))}
         </ul>
+      )}
+      </>
       )}
     </div>
   );

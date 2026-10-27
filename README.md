@@ -7,7 +7,9 @@ hosted on [Vercel](https://vercel.com), data in [Supabase](https://supabase.com)
 - `app/` – pages: home, offline emergency page (`emergency/`), language
   switch (`lang/`), patient login (`login/`) and account (`account/`),
   admin area (`admin/`), WhatsApp code hook (`api/auth/send-code/`),
-  booking (`book/`, `bookings/`) and the reception dashboard (`clinic/`)
+  booking (`book/`, `bookings/`), labs (`labs/`), pharmacy requests
+  (`pharmacies/`), home visits (`home-visits/`), request status pages
+  (`requests/`) and the staff dashboard (`clinic/`)
 - `components/` – shared page parts; `components/admin/` – admin forms
 - `lib/i18n/` – all wording, Sudanese Arabic (`ar.js`) and English (`en.js`)
 - `lib/format.js` – numbers, times, money (always Western digits)
